@@ -50,5 +50,57 @@
         ]
       }
     ]
+  },
+  {
+    "date": "2024-12-08",
+    "exercises": [
+      {
+        "exerciseId": "1",
+        "sets": [
+          {
+            "weight": "70",
+            "reps": "8"
+          },
+          {
+            "weight": "75",
+            "reps": "6"
+          }
+        ]
+      },
+      {
+        "exerciseId": "2",
+        "sets": [
+          {
+            "weight": "80",
+            "reps": "8"
+          },
+          {
+            "weight": "80",
+            "reps": "8"
+          },
+          {
+            "weight": "",
+            "reps": "8"
+          }
+        ]
+      },
+      {
+        "exerciseId": "3",
+        "sets": [
+          {
+            "weight": "59",
+            "reps": "8"
+          },
+          {
+            "weight": "60",
+            "reps": "9"
+          },
+          {
+            "weight": "62",
+            "reps": "8"
+          }
+        ]
+      }
+    ]
   }
 ]
