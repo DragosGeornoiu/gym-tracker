@@ -1,0 +1,74 @@
+[
+  {
+    "id": "1",
+    "name": "Upper Back"
+  },
+  {
+    "id": "2",
+    "name": "Middle Back"
+  },
+  {
+    "id": "3",
+    "name": "Lower Back"
+  },
+  {
+    "id": "4",
+    "name": "Arm Biceps"
+  },
+  {
+    "id": "5",
+    "name": "Chest"
+  },
+  {
+    "id": "6",
+    "name": "Shoulder Lateral"
+  },
+  {
+    "id": "7",
+    "name": "Shoulder Front"
+  },
+  {
+    "id": "8",
+    "name": "Shoulder Back"
+  },
+  {
+    "id": "9",
+    "name": "Arm Triceps"
+  },
+  {
+    "id": "10",
+    "name": "Leg Quadriceps"
+  },
+  {
+    "id": "11",
+    "name": "Leg Hamstring"
+  },
+  {
+    "id": "12",
+    "name": "Leg calf"
+  },
+  {
+    "id": "13",
+    "name": "Arm Forearms"
+  },
+  {
+    "id": "14",
+    "name": "Abs Front"
+  },
+  {
+    "id": "15",
+    "name": "Abs laterals"
+  },
+  {
+    "id": "16",
+    "name": "Leg Tibialis Anterior"
+  },
+  {
+    "id": "17",
+    "name": "Traps"
+  },
+  {
+    "id": "18",
+    "name": "Leg Gluteus Maximus"
+  }
+]

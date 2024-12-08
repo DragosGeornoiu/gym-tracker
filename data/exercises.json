@@ -1,0 +1,135 @@
+[
+  {
+    "id": "1",
+    "name": "Lat pull down Machine",
+    "muscleIds": [
+      "2"
+    ]
+  },
+  {
+    "id": "2",
+    "name": "Cable Row",
+    "muscleIds": [
+      "2"
+    ]
+  },
+  {
+    "id": "3",
+    "name": "Dumbbell Lateral Raise",
+    "muscleIds": [
+      "6"
+    ]
+  },
+  {
+    "id": "4",
+    "name": "Inclined Biceps Curl",
+    "muscleIds": [
+      "4"
+    ]
+  },
+  {
+    "id": "5",
+    "name": "Dumbbell Incline Chest Press",
+    "muscleIds": [
+      "5"
+    ]
+  },
+  {
+    "id": "6",
+    "name": "Dumbbell Flys",
+    "muscleIds": [
+      "5"
+    ]
+  },
+  {
+    "id": "7",
+    "name": "Rear Delt Machine",
+    "muscleIds": [
+      "7"
+    ]
+  },
+  {
+    "id": "8",
+    "name": "Skull Crushers",
+    "muscleIds": [
+      "9"
+    ]
+  },
+  {
+    "id": "10",
+    "name": "Squats",
+    "muscleIds": [
+      "10"
+    ]
+  },
+  {
+    "id": "11",
+    "name": "Romanian Dead Lift",
+    "muscleIds": [
+      "11"
+    ]
+  },
+  {
+    "id": "12",
+    "name": "Leg extensions",
+    "muscleIds": [
+      "10"
+    ]
+  },
+  {
+    "id": "13",
+    "name": "Leg curls",
+    "muscleIds": [
+      "11"
+    ]
+  },
+  {
+    "id": "14",
+    "name": "Calf Raises Machine",
+    "muscleIds": [
+      "12"
+    ]
+  },
+  {
+    "id": "15",
+    "name": "Shoulder back with cables",
+    "muscleIds": [
+      "8"
+    ]
+  },
+  {
+    "id": "16",
+    "name": "Standing dumbbell curls",
+    "muscleIds": [
+      "4"
+    ]
+  },
+  {
+    "id": "17",
+    "name": "Horizontal Bench Press",
+    "muscleIds": [
+      "5"
+    ]
+  },
+  {
+    "id": "18",
+    "name": "Bench Push Machine",
+    "muscleIds": [
+      "5"
+    ]
+  },
+  {
+    "id": "19",
+    "name": "Shoulder lateral cable raises",
+    "muscleIds": [
+      "6"
+    ]
+  },
+  {
+    "id": "20",
+    "name": "Triceps rope cable",
+    "muscleIds": [
+      "9"
+    ]
+  }
+]
