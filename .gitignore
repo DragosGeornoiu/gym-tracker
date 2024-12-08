@@ -1,0 +1,19 @@
+# Node.js
+node_modules/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.swp
+*.bak
+
+# GitHub token (ensure you never commit your token)
+.github-token.txt
+
+# IDE folders
+.idea/

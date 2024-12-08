@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Logs</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<h1>View Logs</h1>
+
+<!-- Tab navigation bar -->
+<div class="tab-container">
+    <button class="tab-button active" data-log="muscles">Muscles</button>
+    <button class="tab-button" data-log="exercises">Exercises</button>
+    <button class="tab-button" data-log="workouts">Workouts</button>
+    <button class="tab-button" data-log="checkins">Checkins</button>
+</div>
+
+<!-- Display log content -->
+<pre id="logDisplay">Click a tab above to load the corresponding log.</pre>
+
+<script>
+    // URLs for each of the JSON files
+    const BASE_URL = 'https://raw.githubusercontent.com/DragosGeornoiu/gym-tracker/main/data';
+    const fileUrls = {
+        muscles: `${BASE_URL}/muscles.json`,
+        exercises: `${BASE_URL}/exercises.json`,
+        workouts: `${BASE_URL}/workouts.json`,
+        checkins: `${BASE_URL}/checkins.json`
+    };
+
+    const logDisplay = document.getElementById('logDisplay');
+    const tabButtons = document.querySelectorAll('.tab-button');
+
+    // Function to fetch and display the JSON content
+    function loadLog(logName) {
+        logDisplay.textContent = 'Loading...';
+
+        fetch(fileUrls[logName])
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to load ${logName}.json: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                logDisplay.textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                logDisplay.textContent = `Error loading ${logName}.json: ${error.message}`;
+            });
+    }
+
+    // Function to handle tab clicks
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+
+            // Add active class to the clicked button
+            button.classList.add('active');
+
+            // Load the corresponding log
+            const logName = button.getAttribute('data-log');
+            loadLog(logName);
+        });
+    });
+
+    // Automatically load the first log (muscles) on page load
+    window.onload = () => loadLog('muscles');
+</script>
+</body>
+</html>

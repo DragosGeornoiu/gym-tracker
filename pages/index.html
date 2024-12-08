@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in Workout</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<h1>Workout Check-in</h1>
+
+<!-- Display current date -->
+<p>Today's Date: <span id="workoutDate"></span></p>
+
+<!-- Workout section -->
+<h2>Workout Exercises</h2>
+<div id="workoutContainer"></div>
+
+<button id="addExerciseButton">+ Add Exercise</button>
+
+<!-- Commit to GitHub section -->
+<h2>Commit Check-in</h2>
+<label for="githubToken">GitHub Token:</label>
+<input type="password" id="githubToken" placeholder="Enter your GitHub Token" />
+
+<button id="commitButton">Commit Check-in</button>
+
+<pre id="statusMessage"></pre>
+
+<script>
+    const BASE_URL = 'https://raw.githubusercontent.com/DragosGeornoiu/gym-tracker/main/data';
+    let exerciseCount = 0;
+    let exercises = [];
+    let muscles = [];
+
+    // Set the current date
+    const currentDate = new Date().toISOString().split('T')[0];
+    document.getElementById('workoutDate').textContent = currentDate;
+
+    // Load exercises and muscles from the GitHub repo
+    async function loadExercisesAndMuscles() {
+        const exerciseResponse = await fetch(`${BASE_URL}/exercises.json`);
+        const muscleResponse = await fetch(`${BASE_URL}/muscles.json`);
+        exercises = await exerciseResponse.json();
+        muscles = await muscleResponse.json();
+    }
+
+    // Add a new exercise
+    document.getElementById('addExerciseButton').addEventListener('click', () => addExercise());
+
+    function addExercise() {
+        exerciseCount++;
+        const workoutContainer = document.getElementById('workoutContainer');
+
+        const exerciseDiv = document.createElement('div');
+        exerciseDiv.classList.add('exercise');
+        exerciseDiv.setAttribute('data-exercise-id', exerciseCount);
+
+        const exerciseOptions = exercises.map(exercise => {
+            const muscleNames = exercise.muscleIds.map(id => {
+                const muscle = muscles.find(m => m.id === id);
+                return muscle ? muscle.name : '';
+            }).join(', ');
+            return `<option value="${exercise.id}">${exercise.name} (${muscleNames})</option>`;
+        }).join('');
+
+        exerciseDiv.innerHTML = `
+        <h3>Exercise ${exerciseCount}</h3>
+        <label for="exerciseName${exerciseCount}">Select Exercise:</label>
+        <select id="exerciseName${exerciseCount}">
+          ${exerciseOptions}
+        </select>
+
+        <div class="setsContainer" id="setsContainer${exerciseCount}"></div>
+        <button class="addSetButton" id="addSetButton${exerciseCount}" data-exercise-id="${exerciseCount}">+ Add Set</button>
+      `;
+
+        workoutContainer.appendChild(exerciseDiv);
+
+        // Attach the event listener for the "Add Set" button of this specific exercise
+        const addSetButton = document.getElementById(`addSetButton${exerciseCount}`);
+        addSetButton.addEventListener('click', () => addSet(exerciseCount));
+    }
+
+    function addSet(exerciseId) {
+        const setsContainer = document.getElementById(`setsContainer${exerciseId}`);
+        const setId = setsContainer.children.length + 1;
+
+        const setDiv = document.createElement('div');
+        setDiv.classList.add('set');
+        setDiv.setAttribute('data-set-id', setId);
+
+        setDiv.innerHTML = `
+        <strong>Set ${setId}</strong>
+        <label for="weight${exerciseId}_${setId}">Weight (kg):</label>
+        <input type="number" id="weight${exerciseId}_${setId}" min="0" />
+
+        <label for="reps${exerciseId}_${setId}">Reps:</label>
+        <input type="number" id="reps${exerciseId}_${setId}" min="0" />
+
+        <button class="deleteSetButton" data-exercise-id="${exerciseId}" data-set-id="${setId}">❌ Delete</button>
+      `;
+
+        setsContainer.appendChild(setDiv);
+
+        // Attach the event listener for the delete button to remove the specific set
+        const deleteButton = setDiv.querySelector(`.deleteSetButton`);
+        deleteButton.addEventListener('click', () => deleteSet(exerciseId, setId));
+    }
+
+    function deleteSet(exerciseId, setId) {
+        const setDiv = document.querySelector(`[data-exercise-id="${exerciseId}"] [data-set-id="${setId}"]`);
+        setDiv.remove();
+    }
+
+    document.getElementById('commitButton').addEventListener('click', async () => {
+        const githubToken = document.getElementById('githubToken').value;
+        if (!githubToken) {
+            alert('Please enter a valid GitHub token.');
+            return;
+        }
+
+        const checkinData = collectCheckinData();
+        await commitCheckin(checkinData, githubToken);
+    });
+
+    function collectCheckinData() {
+        const exercisesData = [];
+        document.querySelectorAll('.exercise').forEach(exerciseDiv => {
+            const exerciseId = exerciseDiv.getAttribute('data-exercise-id');
+            const exerciseName = document.getElementById(`exerciseName${exerciseId}`).value;
+
+            const setsData = [];
+            document.getElementById(`setsContainer${exerciseId}`).querySelectorAll('.set').forEach((setDiv, setIndex) => {
+                const weight = document.getElementById(`weight${exerciseId}_${setIndex + 1}`).value;
+                const reps = document.getElementById(`reps${exerciseId}_${setIndex + 1}`).value;
+
+                setsData.push({ weight, reps });
+            });
+
+            exercisesData.push({ exerciseId, sets: setsData });
+        });
+
+        return { date: currentDate, exercises: exercisesData };
+    }
+
+    async function commitCheckin(checkinData, githubToken) {
+        const GITHUB_API_URL = 'https://api.github.com/repos/DragosGeornoiu/gym-tracker/contents/data/checkins-2024.json';
+
+        const response = await fetch(GITHUB_API_URL, {
+            method: 'GET',
+            headers: {
+                'Authorization': `token ${githubToken}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        const fileData = await response.json();
+        const existingContent = atob(fileData.content);
+        const checkins = existingContent ? JSON.parse(existingContent) : [];
+
+        checkins.push(checkinData);
+
+        const updatedContent = btoa(JSON.stringify(checkins, null, 2));
+
+        await fetch(GITHUB_API_URL, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${githubToken}`,
+                'Accept': 'application/vnd.github.v3+json'
+            },
+            body: JSON.stringify({
+                message: 'New check-in added',
+                content: updatedContent,
+                sha: fileData.sha
+            })
+        });
+
+        document.getElementById('statusMessage').textContent = 'Check-in committed successfully!';
+    }
+
+    // Load exercises and muscles on page load
+    window.onload = loadExercisesAndMuscles;
+</script>
+</body>
+</html>
