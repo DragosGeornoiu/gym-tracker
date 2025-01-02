@@ -15,3 +15,8 @@ npm install
 ## Running app locally
 
 npm run dev
+
+## Notes
+
+* using tutorial for dynamic table edits: https://muhimasri.com/blogs/react-editable-table/
+* 

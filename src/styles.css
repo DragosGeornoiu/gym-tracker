@@ -1,0 +1,27 @@
+table {
+    font-family: sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    margin: 25px;
+    background-color: #fff;
+  }
+  
+  tr {
+    border-bottom: 1px solid #ccc;
+  }
+  
+  /* Alternating row colors */
+  tr:nth-child(even) {
+    background-color: #f2f2f2; /* Gray background for even rows */
+  }
+  
+  th,
+  td {
+    text-align: left;
+    padding: 8px 10px;
+  }
+  
+  th {
+    background-color: #4c5baf; /* Green background for header */
+    color: white;
+  }
