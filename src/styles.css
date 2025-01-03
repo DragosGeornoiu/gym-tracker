@@ -25,3 +25,40 @@ table {
     background-color: #4c5baf; /* Green background for header */
     color: white;
   }
+
+  /* Center the entire page content */
+.muscles-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+/* Wrap the table and button together */
+.table-and-button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; /* Add space between the table and button */
+}
+
+/* Style the save button */
+.save-changes-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4bbd7f;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-changes-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.save-changes-button:hover:not(:disabled) {
+  background-color: #3a9e65;
+}
