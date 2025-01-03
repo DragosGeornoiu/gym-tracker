@@ -5,32 +5,10 @@ import { Table } from "../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { TableCell } from "../components/table/TableCell";
 import { EditCell } from "../components/table/EditCell";
-import AddItemPopup from "../components/popup/AddItemPopup"; // Import the AddItemPopup component
+import RemoveCell from "../components/table/RemoveCell"; 
+import AddItemPopup from "../components/popup/AddItemPopup"; 
 
 const columnHelper = createColumnHelper<Muscle>();
-
-const columns = [
-  columnHelper.accessor("id", {
-    header: "Muscle ID",
-    cell: TableCell,
-    meta: {
-      type: "number",
-      editable: false,
-    },
-  }),
-  columnHelper.accessor("name", {
-    header: "Muscle Name",
-    cell: TableCell,
-    meta: {
-      type: "text",
-      editable: true,
-    },
-  }),
-  columnHelper.display({
-    id: "edit",
-    cell: EditCell,
-  }),
-];
 
 function MusclesPage() {
   const [muscles, setMuscles] = useState<Muscle[]>([]);
@@ -38,14 +16,20 @@ function MusclesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [saving, setSaving] = useState(false);
-  const [showPopup, setShowPopup] = useState(false); // State to control the visibility of the popup
+  const [showPopup, setShowPopup] = useState(false); 
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
+  if(muscles.length > 0) {
+  console.log("muscles.length: " + muscles.length);
+  console.log("last:" + muscles[muscles.length - 1].id +  muscles[muscles.length - 1].name )
+}
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await fetchMuscles();
         setMuscles(data);
-        setOriginalMuscles(data); // Save the original state for comparison
+        setOriginalMuscles(data); 
       } catch (err) {
         setError(err as Error);
       } finally {
@@ -60,7 +44,7 @@ function MusclesPage() {
     setSaving(true);
     try {
       await saveMuscles(muscles);
-      setOriginalMuscles(muscles); // Update the original state after saving
+      setOriginalMuscles(muscles); 
       alert("Changes saved successfully!");
     } catch (err) {
       console.error(err);
@@ -74,10 +58,61 @@ function MusclesPage() {
 
   // Function to handle adding a new muscle via the popup
   const handleAddMuscle = (newMuscle: { [key: string]: string }) => {
-    const newId = (muscles.length + 1).toString(); // Generate a new ID (simple approach)
+    const newId = (muscles.length + 1).toString(); //todo this is not a good strategy
     const muscleToAdd = { id: newId, name: newMuscle.name };
     setMuscles((prevMuscles) => [...prevMuscles, muscleToAdd]);
   };
+
+  // Define handleRemoveMuscle function here so it's in scope for the column
+  const handleRemoveMuscle = (id: string) => {
+    setConfirmDelete(id); 
+  };
+
+  // Function to actually remove the muscle after confirmation
+  const handleConfirmRemoveMuscle = () => {
+    if (confirmDelete) {
+      setMuscles((prevMuscles) => prevMuscles.filter((muscle) => muscle.id !== confirmDelete));
+      setConfirmDelete(null); 
+    }
+  };
+
+  // Function to cancel the removal operation
+  const handleCancelRemoveMuscle = () => {
+    setConfirmDelete(null); 
+  };
+
+  // Now define the columns after handleRemoveMuscle is in scope
+  const columns = [
+    columnHelper.accessor("id", {
+      header: "Muscle ID",
+      cell: TableCell,
+      meta: {
+        type: "number",
+        editable: false,
+      },
+    }),
+    columnHelper.accessor("name", {
+      header: "Muscle Name",
+      cell: TableCell,
+      meta: {
+        type: "text",
+        editable: true,
+      },
+    }),
+    columnHelper.display({
+      id: "edit",
+      cell: EditCell,
+    }),
+    columnHelper.display({
+      id: "remove",
+      cell: ({ row }) => (
+        <RemoveCell
+          rowId={row.original.id}
+          onRemove={handleRemoveMuscle}
+        />
+      ),
+    }),
+  ];
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -96,19 +131,26 @@ function MusclesPage() {
         </button>
         <button
           className="add-muscle-button"
-          onClick={() => setShowPopup(true)} // Open the popup to add a new muscle
+          onClick={() => setShowPopup(true)} 
         >
           Add New Muscle
         </button>
       </div>
 
-      {/* Render the AddItemPopup if showPopup is true */}
       {showPopup && (
         <AddItemPopup
-          fields={[{ name: "name", label: "Muscle Name", type: "text" }]} // Define the fields for the popup
-          onAdd={handleAddMuscle} // Handle the muscle addition
-          onClose={() => setShowPopup(false)} // Close the popup
+          fields={[{ name: "name", label: "Muscle Name", type: "text" }]} 
+          onAdd={handleAddMuscle} 
+          onClose={() => setShowPopup(false)} 
         />
+      )}
+
+      {confirmDelete && (
+        <div className="confirmation-dialog">
+          <p>Are you sure you want to remove this muscle?</p>
+          <button onClick={handleConfirmRemoveMuscle}>Yes, Remove</button>
+          <button onClick={handleCancelRemoveMuscle}>Cancel</button>
+        </div>
       )}
     </div>
   );
