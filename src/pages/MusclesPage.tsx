@@ -5,6 +5,7 @@ import { Table } from "../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { TableCell } from "../components/table/TableCell";
 import { EditCell } from "../components/table/EditCell";
+import AddItemPopup from "../components/popup/AddItemPopup"; // Import the AddItemPopup component
 
 const columnHelper = createColumnHelper<Muscle>();
 
@@ -37,6 +38,7 @@ function MusclesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showPopup, setShowPopup] = useState(false); // State to control the visibility of the popup
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,6 +72,13 @@ function MusclesPage() {
 
   const hasUnsavedChanges = JSON.stringify(muscles) !== JSON.stringify(originalMuscles);
 
+  // Function to handle adding a new muscle via the popup
+  const handleAddMuscle = (newMuscle: { [key: string]: string }) => {
+    const newId = (muscles.length + 1).toString(); // Generate a new ID (simple approach)
+    const muscleToAdd = { id: newId, name: newMuscle.name };
+    setMuscles((prevMuscles) => [...prevMuscles, muscleToAdd]);
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -85,7 +94,22 @@ function MusclesPage() {
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
+        <button
+          className="add-muscle-button"
+          onClick={() => setShowPopup(true)} // Open the popup to add a new muscle
+        >
+          Add New Muscle
+        </button>
       </div>
+
+      {/* Render the AddItemPopup if showPopup is true */}
+      {showPopup && (
+        <AddItemPopup
+          fields={[{ name: "name", label: "Muscle Name", type: "text" }]} // Define the fields for the popup
+          onAdd={handleAddMuscle} // Handle the muscle addition
+          onClose={() => setShowPopup(false)} // Close the popup
+        />
+      )}
     </div>
   );
 }
