@@ -1,9 +1,12 @@
 [
   {
     "id": "1",
-    "name": "Lat pull down Machine",
+    "name": "Lat pull down Machine2",
     "muscleIds": [
       "2"
+    ],
+    "muscleNames": [
+      "Middle Back"
     ]
   },
   {
@@ -11,6 +14,9 @@
     "name": "Cable Row",
     "muscleIds": [
       "2"
+    ],
+    "muscleNames": [
+      "Middle Back"
     ]
   },
   {
@@ -18,6 +24,9 @@
     "name": "Dumbbell Lateral Raise",
     "muscleIds": [
       "6"
+    ],
+    "muscleNames": [
+      "Shoulder Lateral"
     ]
   },
   {
@@ -25,6 +34,9 @@
     "name": "Inclined Biceps Curl",
     "muscleIds": [
       "4"
+    ],
+    "muscleNames": [
+      "Arm Biceps"
     ]
   },
   {
@@ -32,6 +44,9 @@
     "name": "Dumbbell Incline Chest Press",
     "muscleIds": [
       "5"
+    ],
+    "muscleNames": [
+      "Chest"
     ]
   },
   {
@@ -39,6 +54,9 @@
     "name": "Dumbbell Flys",
     "muscleIds": [
       "5"
+    ],
+    "muscleNames": [
+      "Chest"
     ]
   },
   {
@@ -46,6 +64,9 @@
     "name": "Rear Delt Machine",
     "muscleIds": [
       "7"
+    ],
+    "muscleNames": [
+      "Shoulder Front"
     ]
   },
   {
@@ -53,6 +74,9 @@
     "name": "Skull Crushers",
     "muscleIds": [
       "9"
+    ],
+    "muscleNames": [
+      "Arm Triceps"
     ]
   },
   {
@@ -60,6 +84,9 @@
     "name": "Squats",
     "muscleIds": [
       "10"
+    ],
+    "muscleNames": [
+      "Leg Quadriceps"
     ]
   },
   {
@@ -67,6 +94,9 @@
     "name": "Romanian Dead Lift",
     "muscleIds": [
       "11"
+    ],
+    "muscleNames": [
+      "Leg Hamstring"
     ]
   },
   {
@@ -74,6 +104,9 @@
     "name": "Leg extensions",
     "muscleIds": [
       "10"
+    ],
+    "muscleNames": [
+      "Leg Quadriceps"
     ]
   },
   {
@@ -81,6 +114,9 @@
     "name": "Leg curls",
     "muscleIds": [
       "11"
+    ],
+    "muscleNames": [
+      "Leg Hamstring"
     ]
   },
   {
@@ -88,6 +124,9 @@
     "name": "Calf Raises Machine",
     "muscleIds": [
       "12"
+    ],
+    "muscleNames": [
+      "Leg calf"
     ]
   },
   {
@@ -95,6 +134,9 @@
     "name": "Shoulder back with cables",
     "muscleIds": [
       "8"
+    ],
+    "muscleNames": [
+      "Shoulder Back"
     ]
   },
   {
@@ -102,6 +144,9 @@
     "name": "Standing dumbbell curls",
     "muscleIds": [
       "4"
+    ],
+    "muscleNames": [
+      "Arm Biceps"
     ]
   },
   {
@@ -109,6 +154,9 @@
     "name": "Horizontal Bench Press",
     "muscleIds": [
       "5"
+    ],
+    "muscleNames": [
+      "Chest"
     ]
   },
   {
@@ -116,6 +164,9 @@
     "name": "Bench Push Machine",
     "muscleIds": [
       "5"
+    ],
+    "muscleNames": [
+      "Chest"
     ]
   },
   {
@@ -123,6 +174,9 @@
     "name": "Shoulder lateral cable raises",
     "muscleIds": [
       "6"
+    ],
+    "muscleNames": [
+      "Shoulder Lateral"
     ]
   },
   {
@@ -130,6 +184,9 @@
     "name": "Triceps rope cable",
     "muscleIds": [
       "9"
+    ],
+    "muscleNames": [
+      "Arm Triceps"
     ]
   }
 ]
