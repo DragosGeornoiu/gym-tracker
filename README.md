@@ -28,3 +28,4 @@ npm run dev
 * id generation will have issue in the current format, especially when deleting previous entries. It should be based on the highest id maybe, and increment that, but not sure what happens when deleting the highest id, previous entries will reference the wrong id.
 * handling for deleting a muscle reference in exercises is not present. Maybe this should not be allowed until you remove the references to it or maybe it should ask for an extra confirmation before deleting also the previous entries, but that seems bad. Maybe something like a deactivation?! 
 * entire look&feel of the project needs to be enhanced
+* For exersises page we need images to be added. Not sure how to handle these, if an url or the image should be commited and saved.
