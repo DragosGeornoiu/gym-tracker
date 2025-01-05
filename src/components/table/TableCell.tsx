@@ -12,6 +12,9 @@ export const TableCell = ({ getValue, row, column, table }) => {
   const tableMeta = table.options.meta;
   const [value, setValue] = useState(initialValue);
 
+  const valueMapping = tableMeta?.valueMapping || ((val) => val);
+  const mappedValue = valueMapping(value);
+
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
@@ -27,10 +30,9 @@ export const TableCell = ({ getValue, row, column, table }) => {
 
   if (tableMeta?.editedRows[row.id]) {
     if (columnMeta?.editable === false) {
-      // Non-editable column: render value as plain text
-      return <span>{value}</span>;
+      return <span>{mappedValue}</span>;
     }
-    
+
     return columnMeta?.type === "select" ? (
       <select onChange={onSelectChange} value={initialValue}>
         {columnMeta?.options?.map((option: Option) => (
@@ -48,5 +50,6 @@ export const TableCell = ({ getValue, row, column, table }) => {
       />
     );
   }
-  return <span>{value}</span>;
+
+  return <span>{mappedValue}</span>;
 };

@@ -7,7 +7,7 @@ function AddItemPopup({
   onAdd,  // Function to add the item
   onClose // Function to close the popup
 }: {
-  fields: { name: string; label: string; type: string }[]; // Each field should have a name, label, and type
+  fields: { name: string; label: string; type: string; options?: { value: string; label: string }[] }[]; // Support for options in select fields
   onAdd: (newItem: { [key: string]: string }) => void;
   onClose: () => void;
 }) {
@@ -16,7 +16,7 @@ function AddItemPopup({
   );
 
   // Handle change for each input field
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -39,14 +39,30 @@ function AddItemPopup({
         {fields.map((field) => (
           <div key={field.name} className="form-group">
             <label htmlFor={field.name}>{field.label}</label>
-            <input
-              id={field.name}
-              name={field.name}
-              type={field.type || 'text'}
-              value={formData[field.name]}
-              onChange={handleChange}
-              placeholder={`Enter ${field.label}`}
-            />
+            {field.type === 'select' ? (
+              <select
+                id={field.name}
+                name={field.name}
+                value={formData[field.name]}
+                onChange={handleChange}
+              >
+                <option value="">Select {field.label}</option>
+                {field.options?.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                id={field.name}
+                name={field.name}
+                type={field.type || 'text'}
+                value={formData[field.name]}
+                onChange={handleChange}
+                placeholder={`Enter ${field.label}`}
+              />
+            )}
           </div>
         ))}
         <div className="popup-actions">

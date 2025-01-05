@@ -8,7 +8,7 @@ export type Muscle = {
 export type Exercise = {
     id: number,
     name: string,
-    muscleIds: number[];
+    muscleId: number;
 };
 
 export type Workout = {

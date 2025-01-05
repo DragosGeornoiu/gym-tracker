@@ -113,3 +113,23 @@ table {
   background-color: #dc3545; /* Red for "Cancel" button */
 }
 
+/* Style the button to match a clean and modern look */
+.add-exercise-button {
+  background-color: #4CAF50; /* Green background */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.add-exercise-button:hover {
+  background-color: #45a049; /* Slightly darker green on hover */
+}
+
+.add-exercise-button:focus {
+  outline: none; /* Remove outline for focus */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Focus shadow */
+}

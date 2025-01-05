@@ -19,11 +19,6 @@ function MusclesPage() {
   const [showPopup, setShowPopup] = useState(false); 
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
-  if(muscles.length > 0) {
-  console.log("muscles.length: " + muscles.length);
-  console.log("last:" + muscles[muscles.length - 1].id +  muscles[muscles.length - 1].name )
-}
-
   useEffect(() => {
     const fetchData = async () => {
       try {

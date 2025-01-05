@@ -1,28 +1,40 @@
-import { Muscle, Exercise, Workout } from "../types";
-
+import { Muscle, Exercise } from "../types";
 
 const GITHUB_API_BASE_URL = "https://api.github.com";
 const REPO_OWNER = "DragosGeornoiu";
 const REPO_NAME = "gym-tracker";
 const MUSCLES_JSON = "data/muscles.json";
-const TOKEN = ""; //TODO this should be injected or something
+const EXERCISES_JSON = "data/exercises.json";
+const TOKEN = "github_pat_..."; // TODO: Replace with a secure method for handling secrets
 
-export async function fetchData<T>(url: string): Promise<T> {
-    const response = await fetch(url);
-    if(!response.ok) {
-        throw new Error('Failed to fetch ${url}: #{response.statusText}');
-    }
-
-    const data = await response.json();
-    return data as T;
+// Generic fetch function
+async function fetchData<T>(url: string): Promise<T> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+  }
+  return response.json() as T;
 }
 
+// Fetch muscles from the JSON file
 export async function fetchMuscles(): Promise<Muscle[]> {
-    return fetchData<Muscle[]>('../../data/muscles.json');
+  return fetchData<Muscle[]>('../../data/muscles.json');
 }
 
-export async function getFileSHA(): Promise<string> {
-  const url = `${GITHUB_API_BASE_URL}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${MUSCLES_JSON}`;
+// Fetch exercises and map muscleIds to muscle names
+export async function fetchExercises(): Promise<Exercise[]> {
+  const muscles = await fetchMuscles();
+  const exercises = await fetchData<Exercise[]>('../../data/exercises.json');
+
+  return exercises.map((exercise) => ({
+    ...exercise,
+    muscleName: muscles.find((muscle) => muscle.id === exercise.muscleId)?.name || "Unknown Muscle",
+  }));
+}
+
+// Retrieve the SHA of a file in the GitHub repository
+export async function getFileSHA(filePath: string): Promise<string> {
+  const url = `${GITHUB_API_BASE_URL}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`;
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${TOKEN}`,
@@ -30,18 +42,18 @@ export async function getFileSHA(): Promise<string> {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch file SHA: ${response.statusText}`);
+    throw new Error(`Failed to fetch file SHA for ${filePath}: ${response.statusText}`);
   }
 
   const data = await response.json();
   return data.sha;
 }
 
-// Save updated data to GitHub
-export async function saveMuscles(muscles: any[]): Promise<void> {
-  const sha = await getFileSHA();
+// Save data to the GitHub repository
+export async function saveData(filePath: string, data: any[], commitMessage: string): Promise<void> {
+  const sha = await getFileSHA(filePath);
 
-  const url = `${GITHUB_API_BASE_URL}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${MUSCLES_JSON}`;
+  const url = `${GITHUB_API_BASE_URL}/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`;
   const response = await fetch(url, {
     method: "PUT",
     headers: {
@@ -49,13 +61,24 @@ export async function saveMuscles(muscles: any[]): Promise<void> {
       Authorization: `Bearer ${TOKEN}`,
     },
     body: JSON.stringify({
-      message: "Update muscles.json via app",
-      content: btoa(JSON.stringify(muscles, null, 2)), // Base64 encode JSON
+      message: commitMessage,
+      content: btoa(JSON.stringify(data, null, 2)), // Base64 encode JSON
       sha,
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to save data: ${response.statusText}`);
+    throw new Error(`Failed to save data to ${filePath}: ${response.statusText}`);
   }
+}
+
+// Save exercises back to the GitHub repository
+export async function saveExercises(exercises: Exercise[]): Promise<void> {
+  const formattedExercises = exercises.map(({ muscleName, ...rest }) => rest); // Exclude muscleName
+  await saveData(EXERCISES_JSON, formattedExercises, "Update exercises.json via app");
+}
+
+// Save muscles back to the GitHub repository
+export async function saveMuscles(muscles: Muscle[]): Promise<void> {
+  await saveData(MUSCLES_JSON, muscles, "Update muscles.json via app");
 }
