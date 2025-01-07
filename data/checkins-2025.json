@@ -1,0 +1,116 @@
+[
+  {
+    "date": "2025-01-02",
+    "exercises": [
+      {
+        "exerciseId": "1",
+        "sets": [
+          {
+            "isWarmup": true,
+            "weight": 10,
+            "reps": 12
+          },
+          {
+            "isWarmup": true,
+            "weight": 20,
+            "reps": 12
+          },
+          {
+            "isWarmup": true,
+            "weight": 30,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 40,
+            "reps": 6
+          },
+          {
+            "isWarmup": false,
+            "weight": 40,
+            "reps": 6
+          },
+          {
+            "isWarmup": false,
+            "weight": 40,
+            "reps": 4
+          }
+        ]
+      },
+      {
+        "exerciseId": "2",
+        "sets": [
+          {
+            "isWarmup": false,
+            "weight": 6.8,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 6.8,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 9.1,
+            "reps": 10
+          }
+        ]
+      },
+      {
+        "exerciseId": "3",
+        "sets": [
+          {
+            "isWarmup": false,
+            "weight": 6.8,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 6.8,
+            "reps": 10
+          },
+
+          {
+            "isWarmup": false,
+            "weight": 6.8,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 9.1,
+            "reps": 10
+          }
+        ]
+      }, 
+      {
+        "exerciseId": "4",
+        "sets": [
+          {
+            "isWarmup": false,
+            "weight": 32,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 36,
+            "reps": 10
+          },
+
+          {
+            "isWarmup": false,
+            "weight": 36,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 36,
+            "reps": 10
+          }
+        ]
+      }
+      
+    ]
+  }
+]
+      

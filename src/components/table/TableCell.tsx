@@ -12,7 +12,7 @@ export const TableCell = ({ getValue, row, column, table }) => {
   const tableMeta = table.options.meta;
   const [value, setValue] = useState(initialValue);
 
-  const valueMapping = tableMeta?.valueMapping || ((val) => val);
+  const valueMapping = columnMeta?.valueMapping || ((val) => val);
   const mappedValue = valueMapping(value);
 
   useEffect(() => {

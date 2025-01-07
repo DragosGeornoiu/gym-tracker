@@ -56,6 +56,9 @@ export const Table = ({
     },
   });
 
+  console.log("Table data:", data);
+  console.log("Table columns:", columns);
+
   return (
     <article className="table-container">
       <table>

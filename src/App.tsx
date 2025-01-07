@@ -1,7 +1,8 @@
 import React from 'react'
 import {Routes, Route} from 'react-router-dom'
-import ExercisesPage from './pages/ExercisesPage'
 import MusclesPage from './pages/MusclesPage'
+import ExercisesPage from './pages/ExercisesPage'
+import CheckinsPage from './pages/CheckinsPage'
 import NotFoundPage from './pages/NotFoundPage'
 import HomePage from './pages/HomePage'
 import { Table} from './components/table/Table'
@@ -14,6 +15,7 @@ const App = () => {
         <Route path='/' element={<HomePage />} />
         <Route path='/muscles' element={<MusclesPage />} />
         <Route path='/exercises' element={<ExercisesPage />} />
+        <Route path='/checkins' element={<CheckinsPage />} />
         <Route path='/notFound' element={<NotFoundPage />} />
 
       </Routes>

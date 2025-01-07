@@ -1,17 +1,23 @@
-
 export type Muscle = {
-    id: number,
+    id: number;
     name: string;
-};
-
-
-export type Exercise = {
-    id: number,
-    name: string,
+  };
+  
+  export type Exercise = {
+    id: number;
+    name: string;
     muscleId: number;
-};
-
-export type Workout = {
-    name: string,
-    
-}
+  };
+  
+  export type Checkin = {
+    date: string;
+    exercises: {
+      exerciseId: string;
+      sets: {
+        isWarmup: boolean;
+        weight: number;
+        reps: number;
+      }[];
+    }[];
+  };
+  
