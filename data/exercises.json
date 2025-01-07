@@ -1,97 +1,77 @@
 [
   {
     "id": "1",
-    "name": "Lat pull down Machine2",
-    "muscleId": "2"
+    "name": "Incline Dumbell Chest Press",
+    "muscleId": "5"
   },
   {
     "id": "2",
-    "name": "Cable Row",
-    "muscleId": "2"
+    "name": "Chest Cable flyes",
+    "muscleId": "5"
   },
   {
     "id": "3",
-    "name": "Dumbbell Lateral Raise",
+    "name": "Cable Shoulder Lateral raises",
     "muscleId": "6"
   },
   {
     "id": "4",
-    "name": "Inclined Biceps Curl",
+    "name": "Incline Biceps curl Machine",
     "muscleId": "4"
   },
   {
     "id": "5",
-    "name": "Dumbbell Incline Chest Press",
-    "muscleId": "5"
+    "name": "Leg Press",
+    "muscleId": "10"
   },
   {
     "id": "6",
-    "name": "Dumbbell Flys",
-    "muscleId": "5"
+    "name": "Prone Leg curl",
+    "muscleId": "11"
   },
   {
     "id": "7",
-    "name": "Rear Delt Machine",
-    "muscleId": "7"
+    "name": "Sitting Calf raises",
+    "muscleId": "19"
   },
   {
     "id": "8",
-    "name": "Skull Crushers",
-    "muscleId": "9"
+    "name": "Traps barbell raises",
+    "muscleId": "17"
   },
   {
     "id": "9",
-    "name": "Squats",
-    "muscleId": "10"
+    "name": "Lat pulldown machine",
+    "muscleId": "1"
   },
   {
     "id": "10",
-    "name": "Romanian Dead Lift",
-    "muscleId": "11"
+    "name": "Low row machine",
+    "muscleId": "2"
   },
   {
     "id": "11",
-    "name": "Leg extensions",
-    "muscleId": "10"
-  },
-  {
-    "id": "12",
-    "name": "Leg curls",
-    "muscleId": "11"
-  },
-  {
-    "id": "13",
-    "name": "Calf Raises Machine",
-    "muscleId": "12"
-  },
-  {
-    "id": "14",
-    "name": "Shoulder back with cables",
+    "name": "Rear Delt Machine",
     "muscleId": "8"
   },
   {
-    "id": "15",
-    "name": "Standing dumbbell curls",
-    "muscleId": "4"
+    "id": "12",
+    "name": "Decline Chest Press Machine",
+    "muscleId": "2"
   },
   {
-    "id": "16",
-    "name": "Horizontal Bench Press",
+    "id": "13",
+    "name": "Vertical Press Chest Machine",
     "muscleId": "5"
   },
   {
-    "id": "17",
-    "name": "Bench Push Machine",
-    "muscleId": "5"
-  },
-  {
-    "id": "18",
-    "name": "Shoulder lateral cable raises",
+    "id": "14",
+    "name": "Standing Dumbbell Shoulder Lateral raises",
     "muscleId": "6"
   },
   {
-    "id": "19",
-    "name": "Triceps rope cable",
+    "id": "15",
+    "name": "Triceps Press Machine",
     "muscleId": "9"
   }
 ]
