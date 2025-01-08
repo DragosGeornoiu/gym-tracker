@@ -133,3 +133,44 @@ table td .muscle-name {
   white-space: nowrap;
 }
 
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* Tooltip text */
+.tooltip .tooltip-text {
+  visibility: hidden;
+  width: max-content;
+  background-color: #4bbd7f;
+  color: #fff;
+  text-align: left;
+  border-radius: 4px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* Position above the element */
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: pre-line; /* Allows new lines in the tooltip text */
+  font-size: 12px;
+}
+
+/* Arrow below the tooltip */
+.tooltip .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%; /* Bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #4bbd7f transparent transparent transparent;
+}
+
+/* Show the tooltip on hover */
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+}

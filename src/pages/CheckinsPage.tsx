@@ -32,22 +32,29 @@ const CheckinsPage = () => {
     fetchData();
   }, []);
 
-  // Helper function to generate exercise summary
+
   const getExerciseSummary = (exercise: any, exerciseData: any) => {
     const warmupSets = exercise.sets.filter((set: any) => set.isWarmup).length;
     const workingSets = exercise.sets.filter((set: any) => !set.isWarmup).length;
-  
+
     return (
-      <div className="exercise-summary">
+        <div className="exercise-summary">
         <div className="exercise-name">{exerciseData.name || "Unnamed Exercise"}</div>
-        <div className="set-info">
-          <span className="warmup-sets">{warmupSets} WS</span>
-          <span className="separator">-</span>
-          <span className="working-sets">{workingSets} WKS</span>
+        <div>
+            <span className="tooltip">
+            <span className="warmup-sets">{warmupSets} WS</span>
+            <span className="tooltip-text">{`${warmupSets} Warmup Sets`}</span>
+            </span>
+            <span className="separator">-</span>
+            <span className="tooltip">
+            <span className="working-sets">{workingSets} WKS</span>
+            <span className="tooltip-text">{`${workingSets} Work Sets`}</span>
+            </span>
         </div>
-      </div>
+        </div>
     );
-  };
+    };
+  
 
   // Helper function to generate muscle summary
   const getMuscleSummary = (checkinExercises: any[], allExercises: any[], muscles: any[]) => {
