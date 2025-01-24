@@ -108,30 +108,5 @@
         ]
       }
     ]
-  },
-  {
-    "date": "2025-01-03",
-    "exercises": [
-      {
-        "exerciseId": "5",
-        "sets": [
-          {
-            "isWarmup": true,
-            "weight": "120",
-            "reps": "10"
-          }
-        ]
-      },
-      {
-        "exerciseId": "3",
-        "sets": [
-          {
-            "isWarmup": true,
-            "weight": "10",
-            "reps": "15"
-          }
-        ]
-      }
-    ]
   }
 ]
