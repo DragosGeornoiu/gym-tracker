@@ -1,107 +1,116 @@
 [
   {
-    "date": "2025-01-03",
+    "date": "2025-01-02",
     "exercises": [
       {
-        "exerciseId": "5",
+        "exerciseId": "1",
         "sets": [
           {
-            "reps": 12,
-            "weight": 80,
-            "isWarmup": true
+            "isWarmup": true,
+            "weight": 10,
+            "reps": 12
           },
           {
-            "reps": 10,
-            "weight": 130,
-            "isWarmup": true
+            "isWarmup": true,
+            "weight": 20,
+            "reps": 12
           },
           {
-            "reps": 10,
-            "weight": 180,
-            "isWarmup": false
-          },
-          {
-            "reps": 10,
-            "weight": 220,
-            "isWarmup": false
-          },
-          {
-            "reps": 8,
-            "weight": 260,
-            "isWarmup": false
-          }
-        ]
-      },
-      {
-        "exerciseId": "6",
-        "sets": [
-          {
-            "reps": 10,
-            "weight": 63,
-            "isWarmup": false
-          },
-          {
-            "reps": 8,
-            "weight": 68,
-            "isWarmup": false
-          },
-          {
-            "reps": 8,
-            "weight": 68,
-            "isWarmup": false
-          },
-          {
-            "reps": 8,
-            "weight": 72,
-            "isWarmup": false
-          }
-        ]
-      },
-      {
-        "exerciseId": "7",
-        "sets": [
-          {
-            "reps": 12,
-            "weight": 25,
-            "isWarmup": false
-          },
-          {
-            "reps": 12,
+            "isWarmup": true,
             "weight": 30,
-            "isWarmup": false
+            "reps": 10
           },
           {
-            "reps": 12,
-            "weight": 35,
-            "isWarmup": false
-          },
-          {
-            "reps": 12,
+            "isWarmup": false,
             "weight": 40,
-            "isWarmup": false
+            "reps": 6
+          },
+          {
+            "isWarmup": false,
+            "weight": 40,
+            "reps": 6
+          },
+          {
+            "isWarmup": false,
+            "weight": 40,
+            "reps": 4
           }
         ]
       },
       {
-        "exerciseId": "8",
+        "exerciseId": "2",
         "sets": [
           {
-            "reps": 12,
-            "weight": 40,
-            "isWarmup": false
+            "isWarmup": false,
+            "weight": 6.8,
+            "reps": 10
           },
           {
-            "reps": 12,
-            "weight": 60,
-            "isWarmup": false
+            "isWarmup": false,
+            "weight": 6.8,
+            "reps": 10
           },
           {
-            "reps": 10,
-            "weight": 70,
-            "isWarmup": false
+            "isWarmup": false,
+            "weight": 9.1,
+            "reps": 10
+          }
+        ]
+      },
+      {
+        "exerciseId": "3",
+        "sets": [
+          {
+            "isWarmup": false,
+            "weight": 6.8,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 6.8,
+            "reps": 10
+          },
+
+          {
+            "isWarmup": false,
+            "weight": 6.8,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 9.1,
+            "reps": 10
+          }
+        ]
+      }, 
+      {
+        "exerciseId": "4",
+        "sets": [
+          {
+            "isWarmup": false,
+            "weight": 32,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 36,
+            "reps": 10
+          },
+
+          {
+            "isWarmup": false,
+            "weight": 36,
+            "reps": 10
+          },
+          {
+            "isWarmup": false,
+            "weight": 36,
+            "reps": 10
           }
         ]
       }
+      
     ]
   }
 ]
+      
