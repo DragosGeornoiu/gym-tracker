@@ -6,7 +6,7 @@ const REPO_NAME = "gym-tracker";
 const MUSCLES_JSON = "data/muscles.json";
 const EXERCISES_JSON = "data/exercises.json";
 const CHECKINS_JSON = "data/checkins-2025.json";
-const TOKEN = "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"; // TODO: This should be injected or managed securely
+const TOKEN = "github_pat_"; // TODO: This should be injected or managed securely
 
 // Generic fetch function
 async function fetchData<T>(url: string): Promise<T> {
