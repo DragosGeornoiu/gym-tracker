@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { Table } from "../components/table/Table";
 import { fetchMuscles, fetchExercises, fetchCheckins } from "../utils/dataService";
 import { createColumnHelper } from "@tanstack/react-table";
-import CheckinForm from "../components/forms/CheckinForm"; // Import the CheckinForm
 
 const columnHelper = createColumnHelper<any>();
 
@@ -12,8 +12,7 @@ const CheckinsPage = () => {
   const [muscles, setMuscles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [isFormVisible, setIsFormVisible] = useState(false); // Show/hide form
-  const [editingCheckin, setEditingCheckin] = useState<any | null>(null); // Track the checkin being edited
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +21,6 @@ const CheckinsPage = () => {
         const fetchedCheckins = await fetchCheckins();
         const fetchedExercises = await fetchExercises();
         const fetchedMuscles = await fetchMuscles();
-        
         setCheckins(fetchedCheckins);
         setExercises(fetchedExercises);
         setMuscles(fetchedMuscles);
@@ -35,20 +33,6 @@ const CheckinsPage = () => {
 
     fetchData();
   }, []);
-
-  const handleAddCheckin = () => {
-    setEditingCheckin(null); // No checkin to preload
-    setIsFormVisible(true); // Show the form
-  };
-
-  const handleEditCheckin = (checkin: any) => {
-    setEditingCheckin(checkin); // Preload the selected checkin
-    setIsFormVisible(true); // Show the form
-  };
-
-  const handleFormClose = () => {
-    setIsFormVisible(false);
-  };
 
   const getExerciseSummary = (exercise: any, exerciseData: any) => {
     const warmupSets = exercise.sets.filter((set: any) => set.isWarmup).length;
@@ -131,17 +115,6 @@ const CheckinsPage = () => {
       cell: (info) => info.getValue(),
     }),
     ...processedData[0]?.exercises || [],
-    columnHelper.display({
-      header: "Actions",
-      cell: (info) => (
-        <button
-          className="edit-checkin-button"
-          onClick={() => handleEditCheckin(info.row.original)}
-        >
-          Edit
-        </button>
-      ),
-    }),
   ];
 
   if (loading) {
@@ -151,30 +124,13 @@ const CheckinsPage = () => {
   return (
     <div>
       <h1>Checkins Page</h1>
-      <button onClick={handleAddCheckin} className="add-checkin-button">
+      <button
+        onClick={() => navigate("/add-checkin")}
+        className="add-checkin-button"
+      >
         Add Checkin
       </button>
-      <Table
-        data={processedData}
-        setData={setCheckins}
-        columns={columns}
-      />
-      {isFormVisible && (
-        <CheckinForm
-          editingCheckin={editingCheckin}
-          onClose={handleFormClose}
-          onSave={(newCheckin) => {
-            setCheckins((prevCheckins) =>
-              editingCheckin
-                ? prevCheckins.map((c) => (c.date === editingCheckin.date ? newCheckin : c))
-                : [...prevCheckins, newCheckin]
-            );
-            handleFormClose();
-          }}
-          muscles={muscles}
-          exercises={exercises}
-        />
-      )}
+      <Table data={processedData} setData={setCheckins} columns={columns} />
     </div>
   );
 };

@@ -1,12 +1,13 @@
 import { Muscle, Exercise, Checkin } from "../types";
 
+
 const GITHUB_API_BASE_URL = "https://api.github.com";
 const REPO_OWNER = "DragosGeornoiu";
 const REPO_NAME = "gym-tracker";
 const MUSCLES_JSON = "data/muscles.json";
 const EXERCISES_JSON = "data/exercises.json";
 const CHECKINS_JSON = "data/checkins-2025.json";
-const TOKEN = "github_pat_"; // TODO: This should be injected or managed securely
+const TOKEN = ""; // TODO: This should be injected or managed securely
 
 // Generic fetch function
 async function fetchData<T>(url: string): Promise<T> {
@@ -22,7 +23,6 @@ export async function fetchMuscles(): Promise<Muscle[]> {
   return fetchData<Muscle[]>("../../data/muscles.json");
 }
 
-// Fetch exercises and map muscleIds to muscle names
 export async function fetchExercises(): Promise<Exercise[]> {
   const muscles = await fetchMuscles();
   const exercises = await fetchData<Exercise[]>("../../data/exercises.json");
@@ -33,7 +33,6 @@ export async function fetchExercises(): Promise<Exercise[]> {
   }));
 }
 
-// Fetch checkins data
 export async function fetchCheckins(): Promise<Checkin[]> {
   return fetchData<Checkin[]>("../../data/checkins-2025.json");
 }
@@ -89,7 +88,20 @@ export async function saveMuscles(muscles: Muscle[]): Promise<void> {
   await saveData(MUSCLES_JSON, muscles, "Update muscles.json via app");
 }
 
-// Save checkins back to the GitHub repository
 export async function saveCheckins(checkins: Checkin[]): Promise<void> {
-  await saveData(CHECKINS_JSON, checkins, "Update checkins-2025.json via app");
+  // Fetch the existing checkins
+  const existingCheckins = await fetchCheckins();
+
+  // Add the new checkin to the list
+  existingCheckins.push(checkins[0]);
+
+  // Sort by date in ascending order (oldest first)
+  existingCheckins.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateB.getTime() - dateA.getTime(); // Compare dates
+  });
+
+  // Save the updated checkins back to GitHub
+  await saveData(CHECKINS_JSON, existingCheckins, "Add new checkin to checkins-2025.json");
 }
