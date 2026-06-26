@@ -16,7 +16,7 @@ import com.dragos.geornoiu.gymtracker.data.local.entities.WorkoutEntryEntity
         StrengthSetEntity::class,
         CardioEntryEntity::class
     ],
-    version = 2,
+    version = 1,
     exportSchema = false
 )
 abstract class GymTrackerDatabase : RoomDatabase() {

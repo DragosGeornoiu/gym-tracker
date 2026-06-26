@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -23,27 +26,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.dragos.geornoiu.gymtracker.domain.ExerciseEntry
+import com.dragos.geornoiu.gymtracker.domain.LoadMode
 import com.dragos.geornoiu.gymtracker.domain.WorkoutEntry
 import com.dragos.geornoiu.gymtracker.domain.WorkoutEntryType
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.ui.window.PopupProperties
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutDetailScreen(
     workoutId: Long,
+    workoutTitle: String,
     workoutEntries: List<WorkoutEntry>,
     onBackClick: () -> Unit,
-    onAddWorkoutEntry: (String, WorkoutEntryType) -> Unit,
+    onAddWorkoutEntry: (String, WorkoutEntryType, LoadMode) -> Unit,
     onWorkoutEntryClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var exerciseName by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf(WorkoutEntryType.STRENGTH) }
     var typeMenuExpanded by remember { mutableStateOf(false) }
+    var selectedLoadMode by remember { mutableStateOf(LoadMode.TOTAL) }
+    var loadModeMenuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -71,7 +73,7 @@ fun WorkoutDetailScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Workout #$workoutId",
+                text = workoutTitle,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -106,9 +108,16 @@ fun WorkoutDetailScreen(
                             )
 
                             Text(
-                                text = entry.type.name,
+                                text = entry.type.displayName(),
                                 style = MaterialTheme.typography.bodySmall
                             )
+
+                            if (entry.type == WorkoutEntryType.STRENGTH) {
+                                Text(
+                                    text = "Load: ${entry.loadMode.displayName()}",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
                         }
                     }
                 }
@@ -127,7 +136,7 @@ fun WorkoutDetailScreen(
                 onExpandedChange = { typeMenuExpanded = !typeMenuExpanded }
             ) {
                 OutlinedTextField(
-                    value = selectedType.name,
+                    value = selectedType.displayName(),
                     onValueChange = {},
                     readOnly = true,
                     modifier = Modifier
@@ -150,12 +159,54 @@ fun WorkoutDetailScreen(
                         WorkoutEntryType.STRETCHING
                     ).forEach { type ->
                         DropdownMenuItem(
-                            text = { Text(type.name) },
+                            text = { Text(type.displayName()) },
                             onClick = {
                                 selectedType = type
                                 typeMenuExpanded = false
+
+                                if (type != WorkoutEntryType.STRENGTH) {
+                                    selectedLoadMode = LoadMode.TOTAL
+                                    loadModeMenuExpanded = false
+                                }
                             }
                         )
+                    }
+                }
+            }
+
+            if (selectedType == WorkoutEntryType.STRENGTH) {
+                ExposedDropdownMenuBox(
+                    expanded = loadModeMenuExpanded,
+                    onExpandedChange = { loadModeMenuExpanded = !loadModeMenuExpanded }
+                ) {
+                    OutlinedTextField(
+                        value = selectedLoadMode.displayName(),
+                        onValueChange = {},
+                        readOnly = true,
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
+                        label = { Text("Load mode") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = loadModeMenuExpanded
+                            )
+                        }
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = loadModeMenuExpanded,
+                        onDismissRequest = { loadModeMenuExpanded = false }
+                    ) {
+                        LoadMode.entries.forEach { mode ->
+                            DropdownMenuItem(
+                                text = { Text(mode.displayName()) },
+                                onClick = {
+                                    selectedLoadMode = mode
+                                    loadModeMenuExpanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -163,10 +214,23 @@ fun WorkoutDetailScreen(
             Button(
                 onClick = {
                     val trimmedName = exerciseName.trim()
+
                     if (trimmedName.isNotEmpty()) {
-                        onAddWorkoutEntry(trimmedName, selectedType)
+                        onAddWorkoutEntry(
+                            trimmedName,
+                            selectedType,
+                            if (selectedType == WorkoutEntryType.STRENGTH) {
+                                selectedLoadMode
+                            } else {
+                                LoadMode.TOTAL
+                            }
+                        )
+
                         exerciseName = ""
                         selectedType = WorkoutEntryType.STRENGTH
+                        selectedLoadMode = LoadMode.TOTAL
+                        typeMenuExpanded = false
+                        loadModeMenuExpanded = false
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -174,5 +238,22 @@ fun WorkoutDetailScreen(
                 Text("Add entry")
             }
         }
+    }
+}
+
+private fun WorkoutEntryType.displayName(): String {
+    return when (this) {
+        WorkoutEntryType.STRENGTH -> "Strength"
+        WorkoutEntryType.CARDIO -> "Cardio"
+        WorkoutEntryType.CIRCUIT -> "Circuit"
+        WorkoutEntryType.CIRCUIT_ROUND -> "Circuit round"
+        WorkoutEntryType.STRETCHING -> "Stretching"
+    }
+}
+
+private fun LoadMode.displayName(): String {
+    return when (this) {
+        LoadMode.TOTAL -> "Total"
+        LoadMode.PER_MEMBER -> "Per member"
     }
 }

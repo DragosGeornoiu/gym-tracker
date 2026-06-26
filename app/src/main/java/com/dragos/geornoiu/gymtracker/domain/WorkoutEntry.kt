@@ -8,5 +8,6 @@ data class WorkoutEntry(
     val name: String,
     val orderIndex: Int,
     val isWarmup: Boolean,
+    val loadMode: LoadMode,
     val note: String
 )

@@ -9,6 +9,8 @@ import com.dragos.geornoiu.gymtracker.data.local.entities.StrengthSetEntity
 import com.dragos.geornoiu.gymtracker.data.local.entities.WorkoutEntity
 import com.dragos.geornoiu.gymtracker.data.local.entities.WorkoutEntryEntity
 import kotlinx.coroutines.flow.Flow
+import androidx.room.Delete
+import androidx.room.Update
 
 @Dao
 interface WorkoutDao {
@@ -75,4 +77,13 @@ interface WorkoutDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCardioEntry(cardioEntry: CardioEntryEntity): Long
+
+    @Delete
+    suspend fun deleteStrengthSet(set: StrengthSetEntity)
+
+    @Query("UPDATE strength_sets SET orderIndex = :orderIndex WHERE id = :id")
+    suspend fun updateStrengthSetOrder(id: Long, orderIndex: Int)
+
+    @Update
+    suspend fun updateStrengthSet(set: StrengthSetEntity)
 }

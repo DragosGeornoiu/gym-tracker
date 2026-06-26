@@ -35,5 +35,6 @@ data class WorkoutEntryEntity(
     val name: String,
     val orderIndex: Int,
     val isWarmup: Boolean = false,
+    val loadMode: String = "TOTAL",
     val note: String = ""
 )
