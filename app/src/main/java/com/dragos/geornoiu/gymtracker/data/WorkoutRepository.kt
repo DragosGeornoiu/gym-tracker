@@ -1,6 +1,7 @@
 package com.dragos.geornoiu.gymtracker.data
 
 import com.dragos.geornoiu.gymtracker.data.local.WorkoutDao
+import com.dragos.geornoiu.gymtracker.data.local.entities.ExerciseDefinitionEntity
 import com.dragos.geornoiu.gymtracker.data.local.entities.WorkoutEntity
 import com.dragos.geornoiu.gymtracker.data.local.entities.WorkoutEntryEntity
 import com.dragos.geornoiu.gymtracker.domain.WorkoutEntry
@@ -11,8 +12,12 @@ import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import com.dragos.geornoiu.gymtracker.data.local.entities.StrengthSetEntity
 import com.dragos.geornoiu.gymtracker.domain.EffortRating
+import com.dragos.geornoiu.gymtracker.domain.ExerciseDefinition
 import com.dragos.geornoiu.gymtracker.domain.StrengthSet
 import com.dragos.geornoiu.gymtracker.domain.LoadMode
+import com.dragos.geornoiu.gymtracker.data.local.entities.ConfigOptionEntity
+import com.dragos.geornoiu.gymtracker.domain.ConfigGroupKey
+import com.dragos.geornoiu.gymtracker.domain.ConfigOption
 
 class WorkoutRepository(
     private val workoutDao: WorkoutDao
@@ -195,4 +200,160 @@ class WorkoutRepository(
             )
         )
     }
+
+    fun observeExerciseDefinitions(): Flow<List<ExerciseDefinition>> {
+        return workoutDao.observeExerciseDefinitions()
+            .map { definitions ->
+                definitions.map { it.toDomain() }
+            }
+    }
+
+    suspend fun addExerciseDefinition(
+        name: String,
+        defaultType: WorkoutEntryType,
+        defaultLoadMode: LoadMode
+    ): Long {
+        return workoutDao.insertExerciseDefinition(
+            ExerciseDefinitionEntity(
+                name = name,
+                defaultType = defaultType.name,
+                defaultLoadMode = defaultLoadMode.name,
+                isBuiltIn = false,
+                isArchived = false
+            )
+        )
+    }
+
+    suspend fun seedDefaultExerciseDefinitionsIfNeeded() {
+        if (workoutDao.getExerciseDefinitionCount() > 0) {
+            return
+        }
+
+        val defaults = listOf(
+            ExerciseDefinitionEntity(
+                name = "Biceps curl",
+                defaultType = WorkoutEntryType.STRENGTH.name,
+                defaultLoadMode = LoadMode.PER_MEMBER.name,
+                isBuiltIn = true
+            ),
+            ExerciseDefinitionEntity(
+                name = "Triceps extension",
+                defaultType = WorkoutEntryType.STRENGTH.name,
+                defaultLoadMode = LoadMode.PER_MEMBER.name,
+                isBuiltIn = true
+            ),
+            ExerciseDefinitionEntity(
+                name = "RDL",
+                defaultType = WorkoutEntryType.STRENGTH.name,
+                defaultLoadMode = LoadMode.TOTAL.name,
+                isBuiltIn = true
+            ),
+            ExerciseDefinitionEntity(
+                name = "Running",
+                defaultType = WorkoutEntryType.CARDIO.name,
+                defaultLoadMode = LoadMode.TOTAL.name,
+                isBuiltIn = true
+            ),
+            ExerciseDefinitionEntity(
+                name = "Rowing",
+                defaultType = WorkoutEntryType.CARDIO.name,
+                defaultLoadMode = LoadMode.TOTAL.name,
+                isBuiltIn = true
+            ),
+            ExerciseDefinitionEntity(
+                name = "Bike",
+                defaultType = WorkoutEntryType.CARDIO.name,
+                defaultLoadMode = LoadMode.TOTAL.name,
+                isBuiltIn = true
+            ),
+            ExerciseDefinitionEntity(
+                name = "Stretching",
+                defaultType = WorkoutEntryType.STRETCHING.name,
+                defaultLoadMode = LoadMode.TOTAL.name,
+                isBuiltIn = true
+            )
+        )
+
+        workoutDao.insertExerciseDefinitions(defaults)
+    }
+
+    private fun ExerciseDefinitionEntity.toDomain(): ExerciseDefinition {
+        return ExerciseDefinition(
+            id = id,
+            name = name,
+            defaultType = WorkoutEntryType.valueOf(defaultType),
+            defaultLoadMode = LoadMode.valueOf(defaultLoadMode),
+            isBuiltIn = isBuiltIn,
+            isArchived = isArchived
+        )
+    }
+    fun observeConfigOptions(groupKey: String): Flow<List<ConfigOption>> {
+        return workoutDao.observeConfigOptions(groupKey)
+            .map { options ->
+                options.map { it.toDomain() }
+            }
+    }
+
+    suspend fun addConfigOption(
+        groupKey: String,
+        label: String
+    ): Long {
+        val orderIndex = workoutDao.getConfigOptionCountForGroup(groupKey)
+
+        return workoutDao.insertConfigOption(
+            ConfigOptionEntity(
+                groupKey = groupKey,
+                label = label.trim(),
+                isBuiltIn = false,
+                isArchived = false,
+                orderIndex = orderIndex
+            )
+        )
+    }
+
+    suspend fun seedDefaultConfigOptionsIfNeeded() {
+        seedEquipmentTypesIfNeeded()
+    }
+
+    private suspend fun seedEquipmentTypesIfNeeded() {
+        if (workoutDao.getConfigOptionCountForGroup(ConfigGroupKey.EQUIPMENT_TYPE) > 0) {
+            return
+        }
+
+        val defaults = listOf(
+            "Bodyweight",
+            "Barbell",
+            "Dumbbell",
+            "Cable",
+            "Machine",
+            "Plate-loaded machine",
+            "Sled",
+            "Cardio machine",
+            "Other"
+        )
+
+        workoutDao.insertConfigOptions(
+            defaults.mapIndexed { index, label ->
+                ConfigOptionEntity(
+                    groupKey = ConfigGroupKey.EQUIPMENT_TYPE,
+                    label = label,
+                    isBuiltIn = true,
+                    isArchived = false,
+                    orderIndex = index
+                )
+            }
+        )
+    }
+
+    private fun ConfigOptionEntity.toDomain(): ConfigOption {
+        return ConfigOption(
+            id = id,
+            groupKey = groupKey,
+            label = label,
+            isBuiltIn = isBuiltIn,
+            isArchived = isArchived,
+            orderIndex = orderIndex
+        )
+    }
+
 }

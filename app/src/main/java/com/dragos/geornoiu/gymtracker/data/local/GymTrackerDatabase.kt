@@ -8,13 +8,18 @@ import com.dragos.geornoiu.gymtracker.data.local.entities.CardioEntryEntity
 import com.dragos.geornoiu.gymtracker.data.local.entities.StrengthSetEntity
 import com.dragos.geornoiu.gymtracker.data.local.entities.WorkoutEntity
 import com.dragos.geornoiu.gymtracker.data.local.entities.WorkoutEntryEntity
+import com.dragos.geornoiu.gymtracker.data.local.entities.ExerciseDefinitionEntity
+import com.dragos.geornoiu.gymtracker.data.local.entities.ConfigOptionEntity
+
 
 @Database(
     entities = [
         WorkoutEntity::class,
         WorkoutEntryEntity::class,
         StrengthSetEntity::class,
-        CardioEntryEntity::class
+        CardioEntryEntity::class,
+        ExerciseDefinitionEntity::class,
+        ConfigOptionEntity::class,
     ],
     version = 1,
     exportSchema = false
@@ -40,4 +45,5 @@ abstract class GymTrackerDatabase : RoomDatabase() {
             }
         }
     }
+
 }

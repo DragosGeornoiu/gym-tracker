@@ -11,6 +11,8 @@ import com.dragos.geornoiu.gymtracker.data.local.entities.WorkoutEntryEntity
 import kotlinx.coroutines.flow.Flow
 import androidx.room.Delete
 import androidx.room.Update
+import com.dragos.geornoiu.gymtracker.data.local.entities.ExerciseDefinitionEntity
+import com.dragos.geornoiu.gymtracker.data.local.entities.ConfigOptionEntity
 
 @Dao
 interface WorkoutDao {
@@ -21,58 +23,72 @@ interface WorkoutDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWorkout(workout: WorkoutEntity): Long
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM workout_entries 
         WHERE workoutId = :workoutId 
         AND parentEntryId IS NULL 
         ORDER BY orderIndex ASC
-    """)
+    """
+    )
     fun observeRootWorkoutEntries(workoutId: Long): Flow<List<WorkoutEntryEntity>>
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM workout_entries 
         WHERE parentEntryId = :parentEntryId 
         ORDER BY orderIndex ASC
-    """)
+    """
+    )
     fun observeChildWorkoutEntries(parentEntryId: Long): Flow<List<WorkoutEntryEntity>>
 
-    @Query("""
+    @Query(
+        """
         SELECT COUNT(*) FROM workout_entries 
         WHERE workoutId = :workoutId 
         AND parentEntryId IS NULL
-    """)
+    """
+    )
     suspend fun getRootWorkoutEntryCount(workoutId: Long): Int
 
-    @Query("""
+    @Query(
+        """
         SELECT COUNT(*) FROM workout_entries 
         WHERE parentEntryId = :parentEntryId
-    """)
+    """
+    )
     suspend fun getChildWorkoutEntryCount(parentEntryId: Long): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWorkoutEntry(entry: WorkoutEntryEntity): Long
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM strength_sets 
         WHERE workoutEntryId = :workoutEntryId 
         ORDER BY orderIndex ASC
-    """)
+    """
+    )
     fun observeStrengthSets(workoutEntryId: Long): Flow<List<StrengthSetEntity>>
 
-    @Query("""
+    @Query(
+        """
         SELECT COUNT(*) FROM strength_sets 
         WHERE workoutEntryId = :workoutEntryId
-    """)
+    """
+    )
     suspend fun getStrengthSetCount(workoutEntryId: Long): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStrengthSet(set: StrengthSetEntity): Long
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM cardio_entries 
         WHERE workoutEntryId = :workoutEntryId 
         LIMIT 1
-    """)
+    """
+    )
     fun observeCardioEntry(workoutEntryId: Long): Flow<CardioEntryEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -86,4 +102,39 @@ interface WorkoutDao {
 
     @Update
     suspend fun updateStrengthSet(set: StrengthSetEntity)
+
+    @Query(
+        """
+    SELECT * FROM exercise_definitions
+    WHERE isArchived = 0
+    ORDER BY name ASC
+"""
+    )
+    fun observeExerciseDefinitions(): Flow<List<ExerciseDefinitionEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertExerciseDefinition(exerciseDefinition: ExerciseDefinitionEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertExerciseDefinitions(exerciseDefinitions: List<ExerciseDefinitionEntity>)
+
+    @Query("SELECT COUNT(*) FROM exercise_definitions")
+    suspend fun getExerciseDefinitionCount(): Int
+
+    @Query("""
+    SELECT * FROM config_options
+    WHERE groupKey = :groupKey
+    AND isArchived = 0
+    ORDER BY orderIndex ASC, label ASC
+""")
+    fun observeConfigOptions(groupKey: String): Flow<List<ConfigOptionEntity>>
+
+    @Query("SELECT COUNT(*) FROM config_options WHERE groupKey = :groupKey")
+    suspend fun getConfigOptionCountForGroup(groupKey: String): Int
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertConfigOption(option: ConfigOptionEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertConfigOptions(options: List<ConfigOptionEntity>)
 }

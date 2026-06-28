@@ -18,6 +18,9 @@ import com.dragos.geornoiu.gymtracker.ui.screens.WorkoutDetailScreen
 import com.dragos.geornoiu.gymtracker.ui.screens.WorkoutHistoryScreen
 import com.dragos.geornoiu.gymtracker.ui.theme.GymTrackerTheme
 import kotlinx.coroutines.launch
+import com.dragos.geornoiu.gymtracker.ui.screens.ExerciseLibraryScreen
+import com.dragos.geornoiu.gymtracker.domain.ConfigGroupKey
+import com.dragos.geornoiu.gymtracker.ui.screens.config.ConfigOptionsScreen
 
 class MainActivity : ComponentActivity() {
     private var selectedWorkoutId by mutableStateOf<Long?>(null)
@@ -25,6 +28,9 @@ class MainActivity : ComponentActivity() {
     private var selectedWorkoutEntryId by mutableStateOf<Long?>(null)
     private var selectedWorkoutEntryType by mutableStateOf<WorkoutEntryType?>(null)
     private var selectedWorkoutEntryName by mutableStateOf<String?>(null)
+    private var showExerciseLibrary by mutableStateOf(false)
+
+    private var showEquipmentTypesConfig by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,10 +38,62 @@ class MainActivity : ComponentActivity() {
 
         val database = GymTrackerDatabase.getDatabase(applicationContext)
         val workoutRepository = WorkoutRepository(database.workoutDao())
+        lifecycleScope.launch {
+            workoutRepository.seedDefaultExerciseDefinitionsIfNeeded()
+            workoutRepository.seedDefaultConfigOptionsIfNeeded()
+        }
 
         setContent {
             GymTrackerTheme {
                 when {
+                    showEquipmentTypesConfig -> {
+                        val equipmentTypes by workoutRepository
+                            .observeConfigOptions(ConfigGroupKey.EQUIPMENT_TYPE)
+                            .collectAsState(initial = emptyList())
+
+                        ConfigOptionsScreen(
+                            title = "Equipment types",
+                            options = equipmentTypes,
+                            onBackClick = {
+                                showEquipmentTypesConfig = false
+                            },
+                            onAddOptionClick = { label ->
+                                lifecycleScope.launch {
+                                    workoutRepository.addConfigOption(
+                                        groupKey = ConfigGroupKey.EQUIPMENT_TYPE,
+                                        label = label
+                                    )
+                                }
+                            }
+                        )
+                    }
+
+                    showExerciseLibrary -> {
+                        val exerciseDefinitions by workoutRepository
+                            .observeExerciseDefinitions()
+                            .collectAsState(initial = emptyList())
+
+                        ExerciseLibraryScreen(
+                            exerciseDefinitions = exerciseDefinitions,
+                            onBackClick = {
+                                showExerciseLibrary = false
+                            },
+                            onAddExerciseClick = { name, type, loadMode ->
+                                lifecycleScope.launch {
+                                    workoutRepository.addExerciseDefinition(
+                                        name = name,
+                                        defaultType = type,
+                                        defaultLoadMode = loadMode
+                                    )
+                                }
+                            },
+                            onConfigureEquipmentTypesClick = {
+                                showEquipmentTypesConfig = true
+                            }
+                        )
+                    }
+
+
                     selectedWorkoutId == null -> {
                         val workouts by workoutRepository
                             .observeWorkoutSummaries()
@@ -59,6 +117,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+
 
                     selectedWorkoutEntryId != null && selectedWorkoutEntryType != null -> {
                         val entryId = selectedWorkoutEntryId!!
@@ -160,6 +219,9 @@ class MainActivity : ComponentActivity() {
                                 selectedWorkoutEntryId = entryId
                                 selectedWorkoutEntryType = entry?.type
                                 selectedWorkoutEntryName = entry?.name
+                            },
+                            onManageExercisesClick = {
+                                showExerciseLibrary = true
                             }
                         )
                     }

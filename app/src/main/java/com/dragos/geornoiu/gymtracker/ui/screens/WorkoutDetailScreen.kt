@@ -39,6 +39,7 @@ fun WorkoutDetailScreen(
     onBackClick: () -> Unit,
     onAddWorkoutEntry: (String, WorkoutEntryType, LoadMode) -> Unit,
     onWorkoutEntryClick: (Long) -> Unit,
+    onManageExercisesClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var exerciseName by remember { mutableStateOf("") }
@@ -130,6 +131,13 @@ fun WorkoutDetailScreen(
                 label = { Text("Exercise name") },
                 singleLine = true
             )
+
+            TextButton(
+                onClick = onManageExercisesClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Manage exercises")
+            }
 
             ExposedDropdownMenuBox(
                 expanded = typeMenuExpanded,
@@ -237,6 +245,7 @@ fun WorkoutDetailScreen(
             ) {
                 Text("Add entry")
             }
+
         }
     }
 }
