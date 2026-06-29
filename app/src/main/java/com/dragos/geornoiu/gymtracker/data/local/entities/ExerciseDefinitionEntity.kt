@@ -10,6 +10,7 @@ data class ExerciseDefinitionEntity(
     val name: String,
     val defaultType: String,
     val defaultLoadMode: String,
+    val equipmentTypeOptionId: Long? = null,
     val isBuiltIn: Boolean = false,
     val isArchived: Boolean = false
 )

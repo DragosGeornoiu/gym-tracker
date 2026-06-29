@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,26 +29,41 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.dragos.geornoiu.gymtracker.domain.ConfigOption
 import com.dragos.geornoiu.gymtracker.domain.ExerciseDefinition
 import com.dragos.geornoiu.gymtracker.domain.LoadMode
 import com.dragos.geornoiu.gymtracker.domain.WorkoutEntryType
+import com.dragos.geornoiu.gymtracker.ui.screens.exercise.DeleteExerciseDialog
+import com.dragos.geornoiu.gymtracker.ui.screens.exercise.EditExerciseDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseLibraryScreen(
     exerciseDefinitions: List<ExerciseDefinition>,
+    equipmentTypes: List<ConfigOption>,
     onBackClick: () -> Unit,
-    onAddExerciseClick: (String, WorkoutEntryType, LoadMode) -> Unit,
+    onAddExerciseClick: (String, WorkoutEntryType, LoadMode, Long?) -> Unit,
+    onUpdateExerciseClick: (ExerciseDefinition) -> Unit,
+    onDeleteExerciseClick: (ExerciseDefinition, () -> Unit) -> Unit,
     onConfigureEquipmentTypesClick: () -> Unit
 ) {
     var nameText by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf(WorkoutEntryType.STRENGTH) }
     var selectedLoadMode by remember { mutableStateOf(LoadMode.TOTAL) }
+    var selectedEquipmentType by remember { mutableStateOf<ConfigOption?>(null) }
 
     var typeMenuExpanded by remember { mutableStateOf(false) }
     var loadModeMenuExpanded by remember { mutableStateOf(false) }
+    var equipmentMenuExpanded by remember { mutableStateOf(false) }
 
     var lastAddedExerciseName by remember { mutableStateOf<String?>(null) }
+
+    val equipmentById = equipmentTypes.associateBy { it.id }
+
+    var exercisePendingEdit by remember { mutableStateOf<ExerciseDefinition?>(null) }
+    var exercisePendingDelete by remember { mutableStateOf<ExerciseDefinition?>(null) }
+
+    var blockedDeleteExercise by remember { mutableStateOf<ExerciseDefinition?>(null) }
 
     Scaffold(
         topBar = {
@@ -176,6 +192,45 @@ fun ExerciseLibraryScreen(
             }
 
             item {
+                ExposedDropdownMenuBox(
+                    expanded = equipmentMenuExpanded,
+                    onExpandedChange = {
+                        equipmentMenuExpanded = !equipmentMenuExpanded
+                    }
+                ) {
+                    OutlinedTextField(
+                        value = selectedEquipmentType?.label ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
+                        label = { Text("Equipment type") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                equipmentMenuExpanded
+                            )
+                        }
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = equipmentMenuExpanded,
+                        onDismissRequest = { equipmentMenuExpanded = false }
+                    ) {
+                        equipmentTypes.forEach { equipment ->
+                            DropdownMenuItem(
+                                text = { Text(equipment.label) },
+                                onClick = {
+                                    selectedEquipmentType = equipment
+                                    equipmentMenuExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            item {
                 TextButton(
                     onClick = onConfigureEquipmentTypesClick,
                     modifier = Modifier.fillMaxWidth()
@@ -197,13 +252,15 @@ fun ExerciseLibraryScreen(
                                     selectedLoadMode
                                 } else {
                                     LoadMode.TOTAL
-                                }
+                                },
+                                selectedEquipmentType?.id
                             )
 
                             lastAddedExerciseName = name
                             nameText = ""
                             selectedType = WorkoutEntryType.STRENGTH
                             selectedLoadMode = LoadMode.TOTAL
+                            selectedEquipmentType = null
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -263,15 +320,89 @@ fun ExerciseLibraryScreen(
                                 )
                             }
 
+                            val equipmentLabel = exercise.equipmentTypeOptionId
+                                ?.let { equipmentById[it]?.label }
+
+                            if (equipmentLabel != null) {
+                                Text(
+                                    text = "Equipment: $equipmentLabel",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+
                             Text(
                                 text = if (exercise.isBuiltIn) "Built-in" else "Custom",
                                 style = MaterialTheme.typography.bodySmall
                             )
+
+                            TextButton(
+                                onClick = { exercisePendingEdit = exercise }
+                            ) {
+                                Text("Edit")
+                            }
+
+                            TextButton(
+                                onClick = { exercisePendingDelete = exercise }
+                            ) {
+                                Text("Delete")
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    exercisePendingEdit?.let { exercise ->
+        EditExerciseDialog(
+            exercise = exercise,
+            equipmentTypes = equipmentTypes,
+            onDismiss = {
+                exercisePendingEdit = null
+            },
+            onSave = { updatedExercise ->
+                onUpdateExerciseClick(updatedExercise)
+                exercisePendingEdit = null
+            }
+        )
+    }
+
+    exercisePendingDelete?.let { exercise ->
+        DeleteExerciseDialog(
+            exercise = exercise,
+            onDismiss = {
+                exercisePendingDelete = null
+            },
+            onConfirmDelete = {
+                onDeleteExerciseClick(it) {
+                    blockedDeleteExercise = it
+                }
+                exercisePendingDelete = null
+            }
+        )
+    }
+
+    blockedDeleteExercise?.let { exercise ->
+        AlertDialog(
+            onDismissRequest = {
+                blockedDeleteExercise = null
+            },
+            title = {
+                Text("Cannot delete exercise")
+            },
+            text = {
+                Text("${exercise.name} is already used in workout entries. Later we will add a replace flow.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        blockedDeleteExercise = null
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
     }
 }
 

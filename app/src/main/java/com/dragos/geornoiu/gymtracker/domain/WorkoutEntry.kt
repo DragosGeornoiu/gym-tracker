@@ -4,6 +4,7 @@ data class WorkoutEntry(
     val id: Long,
     val workoutId: Long,
     val parentEntryId: Long?,
+    val exerciseDefinitionId: Long?,
     val type: WorkoutEntryType,
     val name: String,
     val orderIndex: Int,

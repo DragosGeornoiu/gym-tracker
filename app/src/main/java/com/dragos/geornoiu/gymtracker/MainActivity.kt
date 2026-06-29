@@ -14,7 +14,7 @@ import com.dragos.geornoiu.gymtracker.data.local.GymTrackerDatabase
 import com.dragos.geornoiu.gymtracker.domain.WorkoutEntryType
 import com.dragos.geornoiu.gymtracker.ui.screens.EntryPlaceholderScreen
 import com.dragos.geornoiu.gymtracker.ui.screens.strength.StrengthEntryDetailScreen
-import com.dragos.geornoiu.gymtracker.ui.screens.WorkoutDetailScreen
+import com.dragos.geornoiu.gymtracker.ui.screens.workout.WorkoutDetailScreen
 import com.dragos.geornoiu.gymtracker.ui.screens.WorkoutHistoryScreen
 import com.dragos.geornoiu.gymtracker.ui.theme.GymTrackerTheme
 import kotlinx.coroutines.launch
@@ -64,6 +64,22 @@ class MainActivity : ComponentActivity() {
                                         label = label
                                     )
                                 }
+                            },
+                            onUpdateOptionClick = { option ->
+                                lifecycleScope.launch {
+                                    workoutRepository.updateConfigOption(option)
+                                }
+                            },
+                            onDeleteOptionClick = { option, onBlocked ->
+                                lifecycleScope.launch {
+                                    val canArchive = workoutRepository.canArchiveConfigOption(option)
+
+                                    if (canArchive) {
+                                        workoutRepository.archiveConfigOption(option.id)
+                                    } else {
+                                        onBlocked()
+                                    }
+                                }
                             }
                         )
                     }
@@ -73,23 +89,46 @@ class MainActivity : ComponentActivity() {
                             .observeExerciseDefinitions()
                             .collectAsState(initial = emptyList())
 
+                        val equipmentTypes by workoutRepository
+                            .observeConfigOptions(ConfigGroupKey.EQUIPMENT_TYPE)
+                            .collectAsState(initial = emptyList())
+
                         ExerciseLibraryScreen(
                             exerciseDefinitions = exerciseDefinitions,
+                            equipmentTypes = equipmentTypes,
                             onBackClick = {
                                 showExerciseLibrary = false
                             },
-                            onAddExerciseClick = { name, type, loadMode ->
+                            onAddExerciseClick = { name, type, loadMode, equipmentTypeOptionId ->
                                 lifecycleScope.launch {
                                     workoutRepository.addExerciseDefinition(
                                         name = name,
                                         defaultType = type,
-                                        defaultLoadMode = loadMode
+                                        defaultLoadMode = loadMode,
+                                        equipmentTypeOptionId = equipmentTypeOptionId
                                     )
                                 }
                             },
                             onConfigureEquipmentTypesClick = {
                                 showEquipmentTypesConfig = true
-                            }
+                            },
+
+                            onUpdateExerciseClick = { exercise ->
+                                lifecycleScope.launch {
+                                    workoutRepository.updateExerciseDefinition(exercise)
+                                }
+                            },
+                            onDeleteExerciseClick = { exercise, onBlocked ->
+                                lifecycleScope.launch {
+                                    val canArchive = workoutRepository.canArchiveExerciseDefinition(exercise.id)
+
+                                    if (canArchive) {
+                                        workoutRepository.archiveExerciseDefinition(exercise.id)
+                                    } else {
+                                        onBlocked()
+                                    }
+                                }
+                            },
                         )
                     }
 
@@ -192,10 +231,15 @@ class MainActivity : ComponentActivity() {
                             .observeRootWorkoutEntries(workoutId)
                             .collectAsState(initial = emptyList())
 
+                        val exerciseDefinitions by workoutRepository
+                            .observeExerciseDefinitions()
+                            .collectAsState(initial = emptyList())
+
                         WorkoutDetailScreen(
                             workoutId = workoutId,
                             workoutTitle = selectedWorkoutTitle ?: "Workout",
                             workoutEntries = workoutEntries,
+                            exerciseDefinitions = exerciseDefinitions,
                             onBackClick = {
                                 selectedWorkoutId = null
                                 selectedWorkoutTitle = null
@@ -203,10 +247,11 @@ class MainActivity : ComponentActivity() {
                                 selectedWorkoutEntryType = null
                                 selectedWorkoutEntryName = null
                             },
-                            onAddWorkoutEntry = { name, type, loadMode ->
+                            onAddWorkoutEntry = { exerciseDefinitionId, name, type, loadMode ->
                                 lifecycleScope.launch {
                                     workoutRepository.addWorkoutEntry(
                                         workoutId = workoutId,
+                                        exerciseDefinitionId = exerciseDefinitionId,
                                         name = name,
                                         type = type,
                                         loadMode = loadMode
@@ -222,7 +267,20 @@ class MainActivity : ComponentActivity() {
                             },
                             onManageExercisesClick = {
                                 showExerciseLibrary = true
-                            }
+                            },
+                            onDeleteWorkoutEntryClick = { entry ->
+                                lifecycleScope.launch {
+                                    workoutRepository.deleteWorkoutEntry(entry.id)
+                                }
+                            },
+                            onUpdateWorkoutEntryExerciseClick = { entry, exercise ->
+                                lifecycleScope.launch {
+                                    workoutRepository.updateWorkoutEntryExercise(
+                                        entry = entry,
+                                        exerciseDefinition = exercise
+                                    )
+                                }
+                            },
                         )
                     }
                 }

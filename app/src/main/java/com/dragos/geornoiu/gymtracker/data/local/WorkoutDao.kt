@@ -137,4 +137,42 @@ interface WorkoutDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertConfigOptions(options: List<ConfigOptionEntity>)
+
+    @Update
+    suspend fun updateExerciseDefinition(exerciseDefinition: ExerciseDefinitionEntity)
+
+    @Query("UPDATE exercise_definitions SET isArchived = 1 WHERE id = :id")
+    suspend fun archiveExerciseDefinition(id: Long)
+
+    @Query("SELECT COUNT(*) FROM workout_entries WHERE exerciseDefinitionId = :exerciseDefinitionId")
+    suspend fun getWorkoutEntryCountForExerciseDefinition(exerciseDefinitionId: Long): Int
+
+    @Query("DELETE FROM workout_entries WHERE id = :id")
+    suspend fun deleteWorkoutEntryById(id: Long)
+
+    @Update
+    suspend fun updateWorkoutEntry(entry: WorkoutEntryEntity)
+
+    @Update
+    suspend fun updateConfigOption(option: ConfigOptionEntity)
+
+    @Query("UPDATE config_options SET isArchived = 1 WHERE id = :id")
+    suspend fun archiveConfigOption(id: Long)
+
+    @Query("SELECT COUNT(*) FROM exercise_definitions WHERE equipmentTypeOptionId = :optionId AND isArchived = 0")
+    suspend fun getExerciseDefinitionCountForEquipmentType(optionId: Long): Int
+
+    @Query("""
+    UPDATE workout_entries
+    SET name = :name,
+        type = :type,
+        loadMode = :loadMode
+    WHERE exerciseDefinitionId = :exerciseDefinitionId
+""")
+    suspend fun updateWorkoutEntriesForExerciseDefinition(
+        exerciseDefinitionId: Long,
+        name: String,
+        type: String,
+        loadMode: String
+    )
 }

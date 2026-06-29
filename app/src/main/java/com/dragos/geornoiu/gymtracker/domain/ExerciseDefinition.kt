@@ -5,6 +5,7 @@ data class ExerciseDefinition(
     val name: String,
     val defaultType: WorkoutEntryType,
     val defaultLoadMode: LoadMode,
+    val equipmentTypeOptionId: Long?,
     val isBuiltIn: Boolean,
     val isArchived: Boolean
 )

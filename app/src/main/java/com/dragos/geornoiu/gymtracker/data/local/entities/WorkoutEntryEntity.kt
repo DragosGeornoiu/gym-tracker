@@ -31,6 +31,7 @@ data class WorkoutEntryEntity(
     val id: Long = 0,
     val workoutId: Long,
     val parentEntryId: Long? = null,
+    val exerciseDefinitionId: Long? = null,
     val type: String,
     val name: String,
     val orderIndex: Int,

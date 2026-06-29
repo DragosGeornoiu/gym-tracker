@@ -55,6 +55,7 @@ class WorkoutRepository(
 
     suspend fun addWorkoutEntry(
         workoutId: Long,
+        exerciseDefinitionId: Long?,
         name: String,
         type: WorkoutEntryType,
         loadMode: LoadMode = LoadMode.TOTAL,
@@ -67,6 +68,7 @@ class WorkoutRepository(
             WorkoutEntryEntity(
                 workoutId = workoutId,
                 parentEntryId = null,
+                exerciseDefinitionId = exerciseDefinitionId,
                 type = type.name,
                 name = name,
                 orderIndex = orderIndex,
@@ -96,6 +98,7 @@ class WorkoutRepository(
             id = id,
             workoutId = workoutId,
             parentEntryId = parentEntryId,
+            exerciseDefinitionId = exerciseDefinitionId,
             type = WorkoutEntryType.valueOf(type),
             name = name,
             orderIndex = orderIndex,
@@ -211,13 +214,15 @@ class WorkoutRepository(
     suspend fun addExerciseDefinition(
         name: String,
         defaultType: WorkoutEntryType,
-        defaultLoadMode: LoadMode
+        defaultLoadMode: LoadMode,
+        equipmentTypeOptionId: Long? = null
     ): Long {
         return workoutDao.insertExerciseDefinition(
             ExerciseDefinitionEntity(
                 name = name,
                 defaultType = defaultType.name,
                 defaultLoadMode = defaultLoadMode.name,
+                equipmentTypeOptionId = equipmentTypeOptionId,
                 isBuiltIn = false,
                 isArchived = false
             )
@@ -282,6 +287,7 @@ class WorkoutRepository(
             id = id,
             name = name,
             defaultType = WorkoutEntryType.valueOf(defaultType),
+            equipmentTypeOptionId = equipmentTypeOptionId,
             defaultLoadMode = LoadMode.valueOf(defaultLoadMode),
             isBuiltIn = isBuiltIn,
             isArchived = isArchived
@@ -356,4 +362,83 @@ class WorkoutRepository(
         )
     }
 
+    suspend fun updateExerciseDefinition(exerciseDefinition: ExerciseDefinition) {
+        workoutDao.updateExerciseDefinition(
+            ExerciseDefinitionEntity(
+                id = exerciseDefinition.id,
+                name = exerciseDefinition.name,
+                defaultType = exerciseDefinition.defaultType.name,
+                defaultLoadMode = exerciseDefinition.defaultLoadMode.name,
+                equipmentTypeOptionId = exerciseDefinition.equipmentTypeOptionId,
+                isBuiltIn = exerciseDefinition.isBuiltIn,
+                isArchived = exerciseDefinition.isArchived
+            )
+        )
+
+        workoutDao.updateWorkoutEntriesForExerciseDefinition(
+            exerciseDefinitionId = exerciseDefinition.id,
+            name = exerciseDefinition.name,
+            type = exerciseDefinition.defaultType.name,
+            loadMode = exerciseDefinition.defaultLoadMode.name
+        )
+    }
+
+    suspend fun archiveExerciseDefinition(id: Long) {
+        workoutDao.archiveExerciseDefinition(id)
+    }
+
+    suspend fun canArchiveExerciseDefinition(id: Long): Boolean {
+        return workoutDao.getWorkoutEntryCountForExerciseDefinition(id) == 0
+    }
+
+    suspend fun deleteWorkoutEntry(id: Long) {
+        workoutDao.deleteWorkoutEntryById(id)
+    }
+
+    suspend fun updateWorkoutEntryExercise(
+        entry: WorkoutEntry,
+        exerciseDefinition: ExerciseDefinition
+    ) {
+        workoutDao.updateWorkoutEntry(
+            WorkoutEntryEntity(
+                id = entry.id,
+                workoutId = entry.workoutId,
+                parentEntryId = entry.parentEntryId,
+                exerciseDefinitionId = exerciseDefinition.id,
+                type = exerciseDefinition.defaultType.name,
+                name = exerciseDefinition.name,
+                orderIndex = entry.orderIndex,
+                isWarmup = entry.isWarmup,
+                loadMode = exerciseDefinition.defaultLoadMode.name,
+                note = entry.note
+            )
+        )
+    }
+
+    suspend fun updateConfigOption(option: ConfigOption) {
+        workoutDao.updateConfigOption(
+            ConfigOptionEntity(
+                id = option.id,
+                groupKey = option.groupKey,
+                label = option.label,
+                isBuiltIn = option.isBuiltIn,
+                isArchived = option.isArchived,
+                orderIndex = option.orderIndex
+            )
+        )
+    }
+
+    suspend fun canArchiveConfigOption(option: ConfigOption): Boolean {
+        return when (option.groupKey) {
+            ConfigGroupKey.EQUIPMENT_TYPE -> {
+                workoutDao.getExerciseDefinitionCountForEquipmentType(option.id) == 0
+            }
+
+            else -> true
+        }
+    }
+
+    suspend fun archiveConfigOption(id: Long) {
+        workoutDao.archiveConfigOption(id)
+    }
 }

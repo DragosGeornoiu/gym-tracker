@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,16 +27,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dragos.geornoiu.gymtracker.domain.ConfigOption
+import com.dragos.geornoiu.gymtracker.ui.components.ConfirmationDialog
 
-@Composable
 @OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun ConfigOptionsScreen(
     title: String,
     options: List<ConfigOption>,
     onBackClick: () -> Unit,
-    onAddOptionClick: (String) -> Unit
+    onAddOptionClick: (String) -> Unit,
+    onUpdateOptionClick: (ConfigOption) -> Unit,
+    onDeleteOptionClick: (ConfigOption, () -> Unit) -> Unit
 ) {
     var labelText by remember { mutableStateOf("") }
+    var optionPendingEdit by remember { mutableStateOf<ConfigOption?>(null) }
+    var optionPendingDelete by remember { mutableStateOf<ConfigOption?>(null) }
+    var blockedDeleteOption by remember { mutableStateOf<ConfigOption?>(null) }
+    var lastAddedOptionLabel by remember { mutableStateOf<String?>(null) }
+    var optionPendingUpdate by remember { mutableStateOf<ConfigOption?>(null) }
 
     Scaffold(
         topBar = {
@@ -67,7 +76,10 @@ fun ConfigOptionsScreen(
             item {
                 OutlinedTextField(
                     value = labelText,
-                    onValueChange = { labelText = it },
+                    onValueChange = {
+                        labelText = it
+                        lastAddedOptionLabel = null
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("Option name") },
                     singleLine = true
@@ -81,12 +93,23 @@ fun ConfigOptionsScreen(
 
                         if (label.isNotBlank()) {
                             onAddOptionClick(label)
+                            lastAddedOptionLabel = label
                             labelText = ""
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Add option")
+                }
+            }
+
+            lastAddedOptionLabel?.let { label ->
+                item {
+                    Text(
+                        text = "Added: $label",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
 
@@ -121,17 +144,97 @@ fun ConfigOptionsScreen(
                             )
 
                             Text(
-                                text = if (option.isBuiltIn) {
-                                    "Built-in"
-                                } else {
-                                    "Custom"
-                                },
+                                text = if (option.isBuiltIn) "Built-in" else "Custom",
                                 style = MaterialTheme.typography.bodySmall
                             )
+
+                            TextButton(
+                                onClick = {
+                                    optionPendingEdit = option
+                                }
+                            ) {
+                                Text("Edit")
+                            }
+
+                            TextButton(
+                                onClick = {
+                                    optionPendingDelete = option
+                                }
+                            ) {
+                                Text("Delete")
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    optionPendingEdit?.let { option ->
+        EditConfigOptionDialog(
+            option = option,
+            onDismiss = {
+                optionPendingEdit = null
+            },
+            onSave = { updatedOption ->
+                optionPendingUpdate = updatedOption
+                optionPendingEdit = null
+            }
+        )
+    }
+
+    optionPendingUpdate?.let { option ->
+        ConfirmationDialog(
+            title = "Update option?",
+            message = "Save changes to ${option.label}?",
+            confirmText = "Save",
+            onConfirm = {
+                onUpdateOptionClick(option)
+                optionPendingUpdate = null
+            },
+            onDismiss = {
+                optionPendingUpdate = null
+            }
+        )
+    }
+
+    optionPendingDelete?.let { option ->
+        ConfirmationDialog(
+            title = "Delete option?",
+            message = "${option.label} will be removed from this configuration list.",
+            confirmText = "Delete",
+            onConfirm = {
+                onDeleteOptionClick(option) {
+                    blockedDeleteOption = option
+                }
+                optionPendingDelete = null
+            },
+            onDismiss = {
+                optionPendingDelete = null
+            }
+        )
+    }
+
+    blockedDeleteOption?.let { option ->
+        AlertDialog(
+            onDismissRequest = {
+                blockedDeleteOption = null
+            },
+            title = {
+                Text("Cannot delete option")
+            },
+            text = {
+                Text("${option.label} is currently used. Change existing records to another option before deleting it.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        blockedDeleteOption = null
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
     }
 }
