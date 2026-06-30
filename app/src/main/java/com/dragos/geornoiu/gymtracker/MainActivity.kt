@@ -32,6 +32,9 @@ class MainActivity : ComponentActivity() {
 
     private var showEquipmentTypesConfig by mutableStateOf(false)
 
+    private var selectedWorkoutDate by mutableStateOf<String?>(null)
+    private var selectedWorkoutNotes by mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -142,10 +145,13 @@ class MainActivity : ComponentActivity() {
                             workouts = workouts,
                             onAddWorkoutClick = {
                                 lifecycleScope.launch {
+                                    val today = java.time.LocalDate.now().toString()
                                     val newWorkoutId = workoutRepository.createTodayDraftWorkout()
 
                                     selectedWorkoutId = newWorkoutId
-                                    selectedWorkoutTitle = "Workout ${java.time.LocalDate.now()}"
+                                    selectedWorkoutTitle = "Workout $today"
+                                    selectedWorkoutDate = today
+                                    selectedWorkoutNotes = ""
                                 }
                             },
                             onWorkoutClick = { workoutId ->
@@ -153,6 +159,13 @@ class MainActivity : ComponentActivity() {
 
                                 selectedWorkoutId = workoutId
                                 selectedWorkoutTitle = workout?.title
+                                selectedWorkoutDate = workout?.date
+                                selectedWorkoutNotes = ""
+                            },
+                            onDeleteWorkoutClick = { workout ->
+                                lifecycleScope.launch {
+                                    workoutRepository.deleteWorkout(workout.id)
+                                }
                             }
                         )
                     }
@@ -246,6 +259,8 @@ class MainActivity : ComponentActivity() {
                                 selectedWorkoutEntryId = null
                                 selectedWorkoutEntryType = null
                                 selectedWorkoutEntryName = null
+                                selectedWorkoutDate = null
+                                selectedWorkoutNotes = null
                             },
                             onAddWorkoutEntry = { exerciseDefinitionId, name, type, loadMode ->
                                 lifecycleScope.launch {
@@ -279,6 +294,22 @@ class MainActivity : ComponentActivity() {
                                         entry = entry,
                                         exerciseDefinition = exercise
                                     )
+                                }
+                            },
+                            workoutDate = selectedWorkoutDate ?: "",
+                            workoutNotes = selectedWorkoutNotes ?: "",
+                            onUpdateWorkoutMetadataClick = { title, date, notes ->
+                                lifecycleScope.launch {
+                                    workoutRepository.updateWorkoutMetadata(
+                                        id = workoutId,
+                                        title = title,
+                                        date = date,
+                                        notes = notes
+                                    )
+
+                                    selectedWorkoutTitle = title
+                                    selectedWorkoutDate = date
+                                    selectedWorkoutNotes = notes
                                 }
                             },
                         )

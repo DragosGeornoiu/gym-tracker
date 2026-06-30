@@ -175,4 +175,25 @@ interface WorkoutDao {
         type: String,
         loadMode: String
     )
+
+    @Query("""
+    UPDATE workouts
+    SET title = :title,
+        date = :date,
+        notes = :notes,
+        updatedAt = :updatedAt
+    WHERE id = :id
+""")
+    suspend fun updateWorkoutMetadata(
+        id: Long,
+        title: String,
+        date: String,
+        notes: String,
+        updatedAt: Long
+    )
+
+    @Query("DELETE FROM workouts WHERE id = :id")
+    suspend fun deleteWorkoutById(id: Long)
+
+
 }

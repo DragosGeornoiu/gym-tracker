@@ -45,6 +45,9 @@ fun WorkoutDetailScreen(
     onDeleteWorkoutEntryClick: (WorkoutEntry) -> Unit,
     onManageExercisesClick: () -> Unit,
     onUpdateWorkoutEntryExerciseClick: (WorkoutEntry, ExerciseDefinition) -> Unit,
+    workoutDate: String,
+    workoutNotes: String,
+    onUpdateWorkoutMetadataClick: (String, String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedExercise by remember { mutableStateOf<ExerciseDefinition?>(null) }
@@ -52,6 +55,7 @@ fun WorkoutDetailScreen(
     var entryPendingDelete by remember { mutableStateOf<WorkoutEntry?>(null) }
     var entryPendingEdit by remember { mutableStateOf<WorkoutEntry?>(null) }
     var pendingReplacementExercise by remember { mutableStateOf<ExerciseDefinition?>(null) }
+    var showEditWorkoutDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -87,6 +91,17 @@ fun WorkoutDetailScreen(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
+            }
+
+            item {
+                TextButton(
+                    onClick = {
+                        showEditWorkoutDialog = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Change workout date")
+                }
             }
 
             if (workoutEntries.isEmpty()) {
@@ -295,6 +310,23 @@ fun WorkoutDetailScreen(
             onDismiss = {
                 entryPendingEdit = null
                 pendingReplacementExercise = null
+            }
+        )
+    }
+
+    if (showEditWorkoutDialog) {
+        EditWorkoutDialog(
+            currentDate = workoutDate,
+            onDismiss = {
+                showEditWorkoutDialog = false
+            },
+            onSave = { date ->
+                onUpdateWorkoutMetadataClick(
+                    "Workout $date",
+                    date,
+                    workoutNotes
+                )
+                showEditWorkoutDialog = false
             }
         )
     }

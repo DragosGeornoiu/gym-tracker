@@ -441,4 +441,23 @@ class WorkoutRepository(
     suspend fun archiveConfigOption(id: Long) {
         workoutDao.archiveConfigOption(id)
     }
+
+    suspend fun updateWorkoutMetadata(
+        id: Long,
+        title: String,
+        date: String,
+        notes: String = ""
+    ) {
+        workoutDao.updateWorkoutMetadata(
+            id = id,
+            title = title,
+            date = date,
+            notes = notes,
+            updatedAt = System.currentTimeMillis()
+        )
+    }
+
+    suspend fun deleteWorkout(id: Long) {
+        workoutDao.deleteWorkoutById(id)
+    }
 }

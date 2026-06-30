@@ -31,6 +31,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dragos.geornoiu.gymtracker.domain.WorkoutSummary
 import com.dragos.geornoiu.gymtracker.ui.theme.GymTrackerTheme
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.dragos.geornoiu.gymtracker.ui.components.ConfirmationDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,8 +46,11 @@ fun WorkoutHistoryScreen(
     workouts: List<WorkoutSummary>,
     onAddWorkoutClick: () -> Unit,
     onWorkoutClick: (Long) -> Unit,
+    onDeleteWorkoutClick: (WorkoutSummary) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var workoutPendingDelete by remember { mutableStateOf<WorkoutSummary?>(null) }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -87,7 +98,8 @@ fun WorkoutHistoryScreen(
                 items(workouts) { workout ->
                     WorkoutCard(
                         workout = workout,
-                        onClick = { onWorkoutClick(workout.id) }
+                        onClick = { onWorkoutClick(workout.id) },
+                        onDeleteClick = { workoutPendingDelete = workout }
                     )
                 }
 
@@ -97,14 +109,32 @@ fun WorkoutHistoryScreen(
             }
         }
     }
+
+    workoutPendingDelete?.let { workout ->
+        ConfirmationDialog(
+            title = "Delete workout?",
+            message = "${workout.title} will be deleted together with all its exercise entries.",
+            confirmText = "Delete",
+            onConfirm = {
+                onDeleteWorkoutClick(workout)
+                workoutPendingDelete = null
+            },
+            onDismiss = {
+                workoutPendingDelete = null
+            }
+        )
+    }
 }
 
 @Composable
 private fun WorkoutCard(
     workout: WorkoutSummary,
     onClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
@@ -141,11 +171,38 @@ private fun WorkoutCard(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Text(
-                    text = "${workout.exerciseCount} exercises",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = "${workout.exerciseCount} exercises",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    TextButton(
+                        onClick = {
+                            menuExpanded = true
+                        }
+                    ) {
+                        Text("⋮")
+                    }
+
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = {
+                            menuExpanded = false
+                        }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                menuExpanded = false
+                                onDeleteClick()
+                            }
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -200,7 +257,8 @@ private fun WorkoutHistoryPreview() {
                 )
             ),
             onAddWorkoutClick = {},
-            onWorkoutClick = {}
+            onWorkoutClick = {},
+            onDeleteWorkoutClick = {}
         )
     }
 }
