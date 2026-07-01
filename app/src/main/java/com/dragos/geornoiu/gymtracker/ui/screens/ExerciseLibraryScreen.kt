@@ -45,7 +45,6 @@ fun ExerciseLibraryScreen(
     onAddExerciseClick: (String, WorkoutEntryType, LoadMode, Long?) -> Unit,
     onUpdateExerciseClick: (ExerciseDefinition) -> Unit,
     onDeleteExerciseClick: (ExerciseDefinition, () -> Unit) -> Unit,
-    onConfigureEquipmentTypesClick: () -> Unit
 ) {
     var nameText by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf(WorkoutEntryType.STRENGTH) }
@@ -227,15 +226,6 @@ fun ExerciseLibraryScreen(
                             )
                         }
                     }
-                }
-            }
-
-            item {
-                TextButton(
-                    onClick = onConfigureEquipmentTypesClick,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Configure equipment types")
                 }
             }
 

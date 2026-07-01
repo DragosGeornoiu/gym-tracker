@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import com.dragos.geornoiu.gymtracker.ui.screens.ExerciseLibraryScreen
 import com.dragos.geornoiu.gymtracker.domain.ConfigGroupKey
 import com.dragos.geornoiu.gymtracker.ui.screens.config.ConfigOptionsScreen
+import com.dragos.geornoiu.gymtracker.ui.screens.settings.SettingsScreen
 
 class MainActivity : ComponentActivity() {
     private var selectedWorkoutId by mutableStateOf<Long?>(null)
@@ -34,6 +35,8 @@ class MainActivity : ComponentActivity() {
 
     private var selectedWorkoutDate by mutableStateOf<String?>(null)
     private var selectedWorkoutNotes by mutableStateOf<String?>(null)
+
+    private var showSettings by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +52,22 @@ class MainActivity : ComponentActivity() {
         setContent {
             GymTrackerTheme {
                 when {
+                    showSettings -> {
+                        SettingsScreen(
+                            onBackClick = {
+                                showSettings = false
+                            },
+                            onExercisesClick = {
+                                showSettings = false
+                                showExerciseLibrary = true
+                            },
+                            onEquipmentTypesClick = {
+                                showSettings = false
+                                showEquipmentTypesConfig = true
+                            }
+                        )
+                    }
+
                     showEquipmentTypesConfig -> {
                         val equipmentTypes by workoutRepository
                             .observeConfigOptions(ConfigGroupKey.EQUIPMENT_TYPE)
@@ -112,10 +131,6 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                             },
-                            onConfigureEquipmentTypesClick = {
-                                showEquipmentTypesConfig = true
-                            },
-
                             onUpdateExerciseClick = { exercise ->
                                 lifecycleScope.launch {
                                     workoutRepository.updateExerciseDefinition(exercise)
@@ -166,6 +181,9 @@ class MainActivity : ComponentActivity() {
                                 lifecycleScope.launch {
                                     workoutRepository.deleteWorkout(workout.id)
                                 }
+                            },
+                            onSettingsClick = {
+                                showSettings = true
                             }
                         )
                     }

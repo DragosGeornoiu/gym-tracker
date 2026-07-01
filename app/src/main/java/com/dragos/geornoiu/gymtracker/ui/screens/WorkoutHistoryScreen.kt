@@ -47,6 +47,7 @@ fun WorkoutHistoryScreen(
     onAddWorkoutClick: () -> Unit,
     onWorkoutClick: (Long) -> Unit,
     onDeleteWorkoutClick: (WorkoutSummary) -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var workoutPendingDelete by remember { mutableStateOf<WorkoutSummary?>(null) }
@@ -55,6 +56,11 @@ fun WorkoutHistoryScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                actions = {
+                    TextButton(onClick = onSettingsClick) {
+                        Text("Settings")
+                    }
+                },
                 title = {
                     Column {
                         Text(
@@ -258,7 +264,8 @@ private fun WorkoutHistoryPreview() {
             ),
             onAddWorkoutClick = {},
             onWorkoutClick = {},
-            onDeleteWorkoutClick = {}
+            onDeleteWorkoutClick = {},
+            onSettingsClick = {}
         )
     }
 }
