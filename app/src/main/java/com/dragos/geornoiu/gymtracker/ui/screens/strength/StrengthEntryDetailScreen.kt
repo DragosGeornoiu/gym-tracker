@@ -28,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.dragos.geornoiu.gymtracker.domain.EffortRating
+import com.dragos.geornoiu.gymtracker.domain.ConfigOption
 import com.dragos.geornoiu.gymtracker.domain.StrengthSet
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,12 +37,13 @@ fun StrengthEntryDetailScreen(
     workoutEntryId: Long,
     entryName: String,
     strengthSets: List<StrengthSet>,
+    effortOptions: List<ConfigOption>,
     onBackClick: () -> Unit,
     onAddSetClick: (
         weightKg: Double?,
         reps: Int?,
         isWarmup: Boolean,
-        effortRating: EffortRating?,
+        effortRatingOptionId: Long?,
         note: String
     ) -> Unit,
     onUpdateSetClick: (StrengthSet) -> Unit,
@@ -53,7 +54,7 @@ fun StrengthEntryDetailScreen(
     var repsText by remember { mutableStateOf("") }
     var isWarmup by remember { mutableStateOf(false) }
     var noteText by remember { mutableStateOf("") }
-    var selectedEffort by remember { mutableStateOf<EffortRating?>(null) }
+    var selectedEffortOption by remember { mutableStateOf<ConfigOption?>(null) }
     var effortMenuExpanded by remember { mutableStateOf(false) }
     var setPendingDelete by remember { mutableStateOf<StrengthSet?>(null) }
     var setPendingEdit by remember { mutableStateOf<StrengthSet?>(null) }
@@ -99,7 +100,8 @@ fun StrengthEntryDetailScreen(
                         onMoveUpClick = { onMoveSetClick(indexedSet.value, -1) },
                         onMoveDownClick = { onMoveSetClick(indexedSet.value, 1) },
                         onDeleteClick = { setPendingDelete = indexedSet.value },
-                        onEditClick = { setPendingEdit = indexedSet.value }
+                        onEditClick = { setPendingEdit = indexedSet.value },
+                        effortOptions = effortOptions,
                     )
                 }
             }
@@ -154,7 +156,7 @@ fun StrengthEntryDetailScreen(
                     onExpandedChange = { effortMenuExpanded = !effortMenuExpanded }
                 ) {
                     OutlinedTextField(
-                        value = selectedEffort?.name ?: "",
+                        value = selectedEffortOption?.label ?: "",
                         onValueChange = {},
                         readOnly = true,
                         modifier = Modifier
@@ -172,11 +174,11 @@ fun StrengthEntryDetailScreen(
                         expanded = effortMenuExpanded,
                         onDismissRequest = { effortMenuExpanded = false }
                     ) {
-                        EffortRating.entries.forEach { rating ->
+                        effortOptions.forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(rating.name) },
+                                text = { Text(option.label) },
                                 onClick = {
-                                    selectedEffort = rating
+                                    selectedEffortOption = option
                                     effortMenuExpanded = false
                                 }
                             )
@@ -205,14 +207,14 @@ fun StrengthEntryDetailScreen(
                                 weight,
                                 reps,
                                 isWarmup,
-                                selectedEffort,
+                                selectedEffortOption?.id,
                                 noteText.trim()
                             )
 
                             weightText = ""
                             repsText = ""
                             isWarmup = false
-                            selectedEffort = null
+                            selectedEffortOption = null
                             noteText = ""
                         }
                     },
@@ -246,7 +248,8 @@ fun StrengthEntryDetailScreen(
             onSave = { updatedSet ->
                 onUpdateSetClick(updatedSet)
                 setPendingEdit = null
-            }
+            },
+            effortOptions = effortOptions,
         )
     }
 }

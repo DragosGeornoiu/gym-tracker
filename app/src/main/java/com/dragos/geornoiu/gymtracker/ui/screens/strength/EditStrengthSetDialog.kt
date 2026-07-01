@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.dragos.geornoiu.gymtracker.domain.ConfigOption
 import com.dragos.geornoiu.gymtracker.domain.EffortRating
 import com.dragos.geornoiu.gymtracker.domain.StrengthSet
 
@@ -28,13 +29,18 @@ import com.dragos.geornoiu.gymtracker.domain.StrengthSet
 @Composable
 fun EditStrengthSetDialog(
     set: StrengthSet,
+    effortOptions: List<ConfigOption>,
     onDismiss: () -> Unit,
     onSave: (StrengthSet) -> Unit
 ) {
     var weightText by remember(set.id) { mutableStateOf(set.weightKg?.toString() ?: "") }
     var repsText by remember(set.id) { mutableStateOf(set.reps?.toString() ?: "") }
     var isWarmup by remember(set.id) { mutableStateOf(set.isWarmup) }
-    var selectedEffort by remember(set.id) { mutableStateOf(set.effortRating) }
+    var selectedEffortOption by remember(set.id) {
+        mutableStateOf(
+            effortOptions.firstOrNull { it.id == set.effortRatingOptionId }
+        )
+    }
     var noteText by remember(set.id) { mutableStateOf(set.note) }
     var effortMenuExpanded by remember { mutableStateOf(false) }
 
@@ -84,7 +90,7 @@ fun EditStrengthSetDialog(
                     onExpandedChange = { effortMenuExpanded = !effortMenuExpanded }
                 ) {
                     OutlinedTextField(
-                        value = selectedEffort?.name ?: "",
+                        value = selectedEffortOption?.label ?: "",
                         onValueChange = {},
                         readOnly = true,
                         modifier = Modifier
@@ -105,16 +111,16 @@ fun EditStrengthSetDialog(
                         DropdownMenuItem(
                             text = { Text("None") },
                             onClick = {
-                                selectedEffort = null
+                                selectedEffortOption = null
                                 effortMenuExpanded = false
                             }
                         )
 
-                        EffortRating.entries.forEach { rating ->
+                        effortOptions.forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(rating.name) },
+                                text = { Text(option.label) },
                                 onClick = {
-                                    selectedEffort = rating
+                                    selectedEffortOption = option
                                     effortMenuExpanded = false
                                 }
                             )
@@ -138,7 +144,7 @@ fun EditStrengthSetDialog(
                             weightKg = weightText.toDoubleOrNull(),
                             reps = repsText.toIntOrNull(),
                             isWarmup = isWarmup,
-                            effortRating = selectedEffort,
+                            effortRatingOptionId = selectedEffortOption?.id,
                             note = noteText.trim()
                         )
                     )

@@ -25,6 +25,6 @@ data class StrengthSetEntity(
     val weightKg: Double?,
     val reps: Int?,
     val isWarmup: Boolean = false,
-    val effortRating: String? = null,
+    val effortRatingOptionId: Long? = null,
     val note: String = ""
 )

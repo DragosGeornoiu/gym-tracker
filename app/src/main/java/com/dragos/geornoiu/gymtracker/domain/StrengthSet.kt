@@ -7,6 +7,6 @@ data class StrengthSet(
     val weightKg: Double?,
     val reps: Int?,
     val isWarmup: Boolean,
-    val effortRating: EffortRating?,
+    val effortRatingOptionId: Long?,
     val note: String
 )

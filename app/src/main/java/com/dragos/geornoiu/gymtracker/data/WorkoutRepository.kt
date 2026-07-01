@@ -120,7 +120,7 @@ class WorkoutRepository(
         weightKg: Double?,
         reps: Int?,
         isWarmup: Boolean,
-        effortRating: EffortRating?,
+        effortRatingOptionId: Long?,
         note: String
     ): Long {
         val orderIndex = workoutDao.getStrengthSetCount(workoutEntryId)
@@ -132,7 +132,7 @@ class WorkoutRepository(
                 weightKg = weightKg,
                 reps = reps,
                 isWarmup = isWarmup,
-                effortRating = effortRating?.name,
+                effortRatingOptionId = effortRatingOptionId,
                 note = note
             )
         )
@@ -146,7 +146,7 @@ class WorkoutRepository(
             weightKg = weightKg,
             reps = reps,
             isWarmup = isWarmup,
-            effortRating = effortRating?.let { EffortRating.valueOf(it) },
+            effortRatingOptionId = effortRatingOptionId,
             note = note
         )
     }
@@ -160,7 +160,6 @@ class WorkoutRepository(
                 weightKg = set.weightKg,
                 reps = set.reps,
                 isWarmup = set.isWarmup,
-                effortRating = set.effortRating?.name,
                 note = set.note
             )
         )
@@ -198,7 +197,7 @@ class WorkoutRepository(
                 weightKg = set.weightKg,
                 reps = set.reps,
                 isWarmup = set.isWarmup,
-                effortRating = set.effortRating?.name,
+                effortRatingOptionId = set.effortRatingOptionId,
                 note = set.note
             )
         )
@@ -290,7 +289,7 @@ class WorkoutRepository(
             equipmentTypeOptionId = equipmentTypeOptionId,
             defaultLoadMode = LoadMode.valueOf(defaultLoadMode),
             isBuiltIn = isBuiltIn,
-            isArchived = isArchived
+            isArchived = isArchived,
         )
     }
     fun observeConfigOptions(groupKey: String): Flow<List<ConfigOption>> {
@@ -319,29 +318,62 @@ class WorkoutRepository(
 
     suspend fun seedDefaultConfigOptionsIfNeeded() {
         seedEquipmentTypesIfNeeded()
+        seedCardioTargetTypesIfNeeded()
+        seedEffortRatingsIfNeeded()
     }
 
     private suspend fun seedEquipmentTypesIfNeeded() {
-        if (workoutDao.getConfigOptionCountForGroup(ConfigGroupKey.EQUIPMENT_TYPE) > 0) {
+        seedConfigGroupIfNeeded(
+            groupKey = ConfigGroupKey.EQUIPMENT_TYPE,
+            labels = listOf(
+                "Bodyweight",
+                "Barbell",
+                "Dumbbell",
+                "Cable",
+                "Machine",
+                "Plate-loaded machine",
+                "Sled",
+                "Cardio machine",
+                "Other"
+            )
+        )
+    }
+
+    private suspend fun seedCardioTargetTypesIfNeeded() {
+        seedConfigGroupIfNeeded(
+            groupKey = ConfigGroupKey.CARDIO_TARGET_TYPE,
+            labels = listOf(
+                "Distance",
+                "Time",
+                "Calories"
+            )
+        )
+    }
+
+    private suspend fun seedEffortRatingsIfNeeded() {
+        seedConfigGroupIfNeeded(
+            groupKey = ConfigGroupKey.EFFORT_RATING,
+            labels = listOf(
+                "Easy",
+                "Moderate",
+                "Hard",
+                "Max"
+            )
+        )
+    }
+
+    private suspend fun seedConfigGroupIfNeeded(
+        groupKey: String,
+        labels: List<String>
+    ) {
+        if (workoutDao.getConfigOptionCountForGroup(groupKey) > 0) {
             return
         }
 
-        val defaults = listOf(
-            "Bodyweight",
-            "Barbell",
-            "Dumbbell",
-            "Cable",
-            "Machine",
-            "Plate-loaded machine",
-            "Sled",
-            "Cardio machine",
-            "Other"
-        )
-
         workoutDao.insertConfigOptions(
-            defaults.mapIndexed { index, label ->
+            labels.mapIndexed { index, label ->
                 ConfigOptionEntity(
-                    groupKey = ConfigGroupKey.EQUIPMENT_TYPE,
+                    groupKey = groupKey,
                     label = label,
                     isBuiltIn = true,
                     isArchived = false,

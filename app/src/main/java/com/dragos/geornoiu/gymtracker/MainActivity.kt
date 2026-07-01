@@ -35,8 +35,10 @@ class MainActivity : ComponentActivity() {
 
     private var selectedWorkoutDate by mutableStateOf<String?>(null)
     private var selectedWorkoutNotes by mutableStateOf<String?>(null)
-
     private var showSettings by mutableStateOf(false)
+
+    private var showCardioTargetTypesConfig by mutableStateOf(false)
+    private var showEffortRatingsConfig by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +66,14 @@ class MainActivity : ComponentActivity() {
                             onEquipmentTypesClick = {
                                 showSettings = false
                                 showEquipmentTypesConfig = true
+                            },
+                            onCardioTargetTypesClick = {
+                                showSettings = false
+                                showCardioTargetTypesConfig = true
+                            },
+                            onEffortRatingsClick = {
+                                showSettings = false
+                                showEffortRatingsConfig = true
                             }
                         )
                     }
@@ -83,6 +93,84 @@ class MainActivity : ComponentActivity() {
                                 lifecycleScope.launch {
                                     workoutRepository.addConfigOption(
                                         groupKey = ConfigGroupKey.EQUIPMENT_TYPE,
+                                        label = label
+                                    )
+                                }
+                            },
+                            onUpdateOptionClick = { option ->
+                                lifecycleScope.launch {
+                                    workoutRepository.updateConfigOption(option)
+                                }
+                            },
+                            onDeleteOptionClick = { option, onBlocked ->
+                                lifecycleScope.launch {
+                                    val canArchive = workoutRepository.canArchiveConfigOption(option)
+
+                                    if (canArchive) {
+                                        workoutRepository.archiveConfigOption(option.id)
+                                    } else {
+                                        onBlocked()
+                                    }
+                                }
+                            }
+                        )
+                    }
+
+                    showCardioTargetTypesConfig -> {
+                        val options by workoutRepository
+                            .observeConfigOptions(ConfigGroupKey.CARDIO_TARGET_TYPE)
+                            .collectAsState(initial = emptyList())
+
+                        ConfigOptionsScreen(
+                            title = "Cardio target types",
+                            options = options,
+                            onBackClick = {
+                                showCardioTargetTypesConfig = false
+                                showSettings = true
+                            },
+                            onAddOptionClick = { label ->
+                                lifecycleScope.launch {
+                                    workoutRepository.addConfigOption(
+                                        groupKey = ConfigGroupKey.CARDIO_TARGET_TYPE,
+                                        label = label
+                                    )
+                                }
+                            },
+                            onUpdateOptionClick = { option ->
+                                lifecycleScope.launch {
+                                    workoutRepository.updateConfigOption(option)
+                                }
+                            },
+                            onDeleteOptionClick = { option, onBlocked ->
+                                lifecycleScope.launch {
+                                    val canArchive = workoutRepository.canArchiveConfigOption(option)
+
+                                    if (canArchive) {
+                                        workoutRepository.archiveConfigOption(option.id)
+                                    } else {
+                                        onBlocked()
+                                    }
+                                }
+                            }
+                        )
+                    }
+
+                    showEffortRatingsConfig -> {
+                        val options by workoutRepository
+                            .observeConfigOptions(ConfigGroupKey.EFFORT_RATING)
+                            .collectAsState(initial = emptyList())
+
+                        ConfigOptionsScreen(
+                            title = "Effort ratings",
+                            options = options,
+                            onBackClick = {
+                                showEffortRatingsConfig = false
+                                showSettings = true
+                            },
+                            onAddOptionClick = { label ->
+                                lifecycleScope.launch {
+                                    workoutRepository.addConfigOption(
+                                        groupKey = ConfigGroupKey.EFFORT_RATING,
                                         label = label
                                     )
                                 }
@@ -199,6 +287,10 @@ class MainActivity : ComponentActivity() {
                                     .observeStrengthSets(entryId)
                                     .collectAsState(initial = emptyList())
 
+                                val effortOptions by workoutRepository
+                                    .observeConfigOptions(ConfigGroupKey.EFFORT_RATING)
+                                    .collectAsState(initial = emptyList())
+
                                 StrengthEntryDetailScreen(
                                     workoutEntryId = entryId,
                                     entryName = selectedWorkoutEntryName ?: "Strength",
@@ -208,14 +300,14 @@ class MainActivity : ComponentActivity() {
                                         selectedWorkoutEntryType = null
                                         selectedWorkoutEntryName = null
                                     },
-                                    onAddSetClick = { weightKg, reps, isWarmup, effortRating, note ->
+                                    onAddSetClick = { weightKg, reps, isWarmup, effortRatingOptionId, note ->
                                         lifecycleScope.launch {
                                             workoutRepository.addStrengthSet(
                                                 workoutEntryId = entryId,
                                                 weightKg = weightKg,
                                                 reps = reps,
                                                 isWarmup = isWarmup,
-                                                effortRating = effortRating,
+                                                effortRatingOptionId = effortRatingOptionId,
                                                 note = note
                                             )
                                         }
@@ -238,7 +330,8 @@ class MainActivity : ComponentActivity() {
                                                 direction = direction
                                             )
                                         }
-                                    }
+                                    },
+                                    effortOptions = effortOptions,
                                 )
                             }
 

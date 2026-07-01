@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.dp
 fun SettingsScreen(
     onBackClick: () -> Unit,
     onExercisesClick: () -> Unit,
-    onEquipmentTypesClick: () -> Unit
+    onEquipmentTypesClick: () -> Unit,
+    onCardioTargetTypesClick: () -> Unit,
+    onEffortRatingsClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -54,6 +56,18 @@ fun SettingsScreen(
                 title = "Equipment types",
                 subtitle = "Manage equipment options",
                 onClick = onEquipmentTypesClick
+            )
+
+            SettingsRow(
+                title = "Cardio target types",
+                subtitle = "Manage cardio target options",
+                onClick = onCardioTargetTypesClick
+            )
+
+            SettingsRow(
+                title = "Effort ratings",
+                subtitle = "Manage effort options",
+                onClick = onEffortRatingsClick
             )
         }
     }

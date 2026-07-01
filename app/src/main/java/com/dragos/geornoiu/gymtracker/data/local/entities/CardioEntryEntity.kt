@@ -22,15 +22,13 @@ data class CardioEntryEntity(
     val id: Long = 0,
     val workoutEntryId: Long,
 
-    // What you planned to do
-    val targetType: String,
+    val targetTypeOptionId: Long,
     val targetValue: Double,
 
-    // What actually happened
     val durationSeconds: Int? = null,
     val distanceMeters: Int? = null,
     val calories: Int? = null,
 
-    val effortRating: String? = null,
+    val effortRatingOptionId: Long? = null,
     val note: String = ""
 )

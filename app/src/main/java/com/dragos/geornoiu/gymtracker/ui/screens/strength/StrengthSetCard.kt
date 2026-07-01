@@ -13,12 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.dragos.geornoiu.gymtracker.domain.ConfigOption
 import com.dragos.geornoiu.gymtracker.domain.StrengthSet
 
 @Composable
 fun StrengthSetCard(
     setNumber: Int,
     set: StrengthSet,
+    effortOptions: List<ConfigOption>,
     canMoveUp: Boolean,
     canMoveDown: Boolean,
     onMoveUpClick: () -> Unit,
@@ -53,8 +55,11 @@ fun StrengthSetCard(
                 Text("Warmup")
             }
 
-            if (set.effortRating != null) {
-                Text("Effort: ${set.effortRating.name}")
+            val effortLabel = set.effortRatingOptionId
+                ?.let { id -> effortOptions.firstOrNull { it.id == id }?.label }
+
+            if (effortLabel != null) {
+                Text("Effort: $effortLabel")
             }
 
             if (set.note.isNotBlank()) {
